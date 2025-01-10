@@ -8,6 +8,25 @@ const sesClient = new SESClient({
   },
 });
 
+// Check if required environment variables are available
+const requiredEnvVars = [
+  "AWS_REGION",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "ADMIN_EMAIL",
+];
+
+const missingEnvVars = requiredEnvVars.filter(
+  (envVar) => !import.meta.env[envVar]
+);
+
+if (missingEnvVars.length > 0) {
+  console.error(
+    `Missing required environment variables: ${missingEnvVars.join(", ")}`
+  );
+  throw new Error("Missing required environment variables");
+}
+
 interface EmailData {
   name: string;
   email: string;
@@ -59,7 +78,7 @@ export async function sendEmails({ name, email, message }: EmailData) {
     ]);
     return { success: true };
   } catch (error) {
-    console.error('Error sending emails:', error);
-    return { success: false, error: 'Failed to send emails' };
+    console.error("Error sending emails:", error);
+    return { success: false, error: "Failed to send emails" };
   }
 }

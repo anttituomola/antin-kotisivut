@@ -1,8 +1,8 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
 
-const posts = await getCollection('blog', ({ data }) => {
+const posts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? !data.draft : true;
 });
 
@@ -11,43 +11,50 @@ const sortedPosts = posts.sort(
 );
 ---
 
-<Layout title="Blog">
+<Layout title="Blog" activePage="blog">
   <div class="max-w-4xl mx-auto">
     <h1 class="text-4xl font-bold text-text-primary mb-8">Blog</h1>
     <div class="grid gap-8">
-      {sortedPosts.map((post) => (
-        <article class="bg-surface rounded-lg shadow-md hover:ring-1 hover:ring-accent transition-all overflow-hidden">
-          <a href={`/blog/${post.slug}`} class="block">
-            <div class="md:flex">
-              {post.data.image && (
-                <div class="md:w-72 shrink-0">
-                  <img
-                    src={post.data.image}
-                    alt={post.data.title}
-                    class="w-full h-48 md:h-full object-cover"
-                  />
-                </div>
-              )}
-              <div class="p-6">
-                <h2 class="text-2xl font-semibold text-text-primary mb-2">{post.data.title}</h2>
-                <p class="text-text-secondary mb-4">{post.data.excerpt}</p>
-                <div class="flex justify-between items-center">
-                  <time datetime={post.data.pubDate.toISOString()} class="text-text-muted">
-                    {new Date(post.data.pubDate).toLocaleDateString()}
-                  </time>
-                  <div class="flex gap-2">
-                    {post.data.tags.map((tag) => (
-                      <span class="bg-accent bg-opacity-20 text-text-primary px-3 py-1 rounded-full text-sm">
-                        {tag}
-                      </span>
-                    ))}
+      {
+        sortedPosts.map((post) => (
+          <article class="bg-surface rounded-lg shadow-md hover:ring-1 hover:ring-accent transition-all overflow-hidden">
+            <a href={`/blog/${post.slug}`} class="block">
+              <div class="md:flex">
+                {post.data.image && (
+                  <div class="md:w-72 shrink-0">
+                    <img
+                      src={post.data.image}
+                      alt={post.data.title}
+                      class="w-full h-48 md:h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div class="p-6">
+                  <h2 class="text-2xl font-semibold text-text-primary mb-2">
+                    {post.data.title}
+                  </h2>
+                  <p class="text-text-secondary mb-4">{post.data.excerpt}</p>
+                  <div class="flex justify-between items-center">
+                    <time
+                      datetime={post.data.pubDate.toISOString()}
+                      class="text-text-muted"
+                    >
+                      {new Date(post.data.pubDate).toLocaleDateString()}
+                    </time>
+                    <div class="flex gap-2">
+                      {post.data.tags.map((tag) => (
+                        <span class="bg-accent bg-opacity-20 text-text-primary px-3 py-1 rounded-full text-sm">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </a>
-        </article>
-      ))}
+            </a>
+          </article>
+        ))
+      }
     </div>
   </div>
 </Layout>

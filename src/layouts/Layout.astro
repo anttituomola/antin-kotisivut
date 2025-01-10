@@ -1,13 +1,18 @@
 ---
-import '@fontsource/inter';
-import '../styles/base.css';
+import "@fontsource/inter";
+import "../styles/base.css";
 
 interface Props {
   title: string;
   description?: string;
+  activePage?: string;
 }
 
-const { title, description = "Personal website and blog" } = Astro.props;
+const {
+  title,
+  description = "Antti Tuomola's personal internet space",
+  activePage = "",
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -24,10 +29,13 @@ const { title, description = "Personal website and blog" } = Astro.props;
     <header class="border-b border-border">
       <nav class="max-w-6xl mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
-          <a href="/" class="text-xl font-semibold text-text-primary hover:text-primary-hover transition-colors">
+          <a
+            href="/"
+            class="text-xl font-semibold text-text-primary hover:text-primary-hover transition-colors"
+          >
             Antti Tuomola
           </a>
-          
+
           <!-- Hamburger menu button -->
           <button
             id="menu-toggle"
@@ -45,37 +53,90 @@ const { title, description = "Personal website and blog" } = Astro.props;
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+                d="M4 6h16M4 12h16M4 18h16"></path>
               <path
                 id="close-icon"
                 class="hidden"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
+                d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
 
           <!-- Desktop menu -->
           <ul class="hidden md:flex gap-6">
-            <li><a href="/" class="text-text-secondary hover:text-primary-hover transition-colors">Home</a></li>
-            <li><a href="/timeline" class="text-text-secondary hover:text-primary-hover transition-colors">Timeline</a></li>
-            <li><a href="/cv" class="text-text-secondary hover:text-primary-hover transition-colors">CV</a></li>
-            <li><a href="/blog" class="text-text-secondary hover:text-primary-hover transition-colors">Blog</a></li>
-            <li><a href="/contact" class="text-text-secondary hover:text-primary-hover transition-colors">Contact</a></li>
+            <li>
+              <a
+                href="/"
+                class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "" ? "bg-primary-hover/10" : ""}`}
+                >Home</a>
+            </li>
+            <li>
+              <a
+                href="/timeline"
+                class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "timeline" ? "bg-primary-hover/10" : ""}`}
+                >Timeline</a>
+            </li>
+            <li>
+              <a
+                href="/cv"
+                class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "cv" ? "bg-primary-hover/10" : ""}`}
+                >CV</a>
+            </li>
+            <li>
+              <a
+                href="/blog"
+                class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "blog" ? "bg-primary-hover/10" : ""}`}
+                >Blog</a>
+            </li>
+            <li>
+              <a
+                href="/contact"
+                class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "contact" ? "bg-primary-hover/10" : ""}`}
+                >Contact</a>
+            </li>
           </ul>
         </div>
 
         <!-- Mobile menu -->
         <div id="mobile-menu" class="hidden md:hidden">
           <ul class="flex flex-col gap-4 py-4">
-            <li><a href="/" class="block text-text-secondary hover:text-primary-hover transition-colors">Home</a></li>
-            <li><a href="/timeline" class="block text-text-secondary hover:text-primary-hover transition-colors">Timeline</a></li>
-            <li><a href="/cv" class="block text-text-secondary hover:text-primary-hover transition-colors">CV</a></li>
-            <li><a href="/blog" class="block text-text-secondary hover:text-primary-hover transition-colors">Blog</a></li>
-            <li><a href="/contact" class="block text-text-secondary hover:text-primary-hover transition-colors">Contact</a></li>
+            <li>
+              <a
+                href="/"
+                class="block text-text-secondary hover:text-primary-hover transition-colors"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="/timeline"
+                class="block text-text-secondary hover:text-primary-hover transition-colors"
+                >Timeline</a
+              >
+            </li>
+            <li>
+              <a
+                href="/cv"
+                class="block text-text-secondary hover:text-primary-hover transition-colors"
+                >CV</a
+              >
+            </li>
+            <li>
+              <a
+                href="/blog"
+                class="block text-text-secondary hover:text-primary-hover transition-colors"
+                >Blog</a
+              >
+            </li>
+            <li>
+              <a
+                href="/contact"
+                class="block text-text-secondary hover:text-primary-hover transition-colors"
+                >Contact</a
+              >
+            </li>
           </ul>
         </div>
       </nav>
@@ -85,21 +146,23 @@ const { title, description = "Personal website and blog" } = Astro.props;
     </main>
     <footer class="border-t border-border mt-12">
       <div class="max-w-6xl mx-auto px-4 py-8 text-center text-text-secondary">
-        <p>&copy; {new Date().getFullYear()} Antti Tuomola. All rights reserved.</p>
+        <p>
+          &copy; {new Date().getFullYear()} Antti Tuomola. All rights reserved.
+        </p>
       </div>
     </footer>
 
     <script>
-      const menuToggle = document.getElementById('menu-toggle');
-      const mobileMenu = document.getElementById('mobile-menu');
-      const menuIcon = document.getElementById('menu-icon');
-      const closeIcon = document.getElementById('close-icon');
+      const menuToggle = document.getElementById("menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const menuIcon = document.getElementById("menu-icon");
+      const closeIcon = document.getElementById("close-icon");
 
       if (menuToggle && mobileMenu && menuIcon && closeIcon) {
-        menuToggle.addEventListener('click', () => {
-          mobileMenu.classList.toggle('hidden');
-          menuIcon.classList.toggle('hidden');
-          closeIcon.classList.toggle('hidden');
+        menuToggle.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
+          menuIcon.classList.toggle("hidden");
+          closeIcon.classList.toggle("hidden");
         });
       }
     </script>

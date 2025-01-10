@@ -1,0 +1,169 @@
+---
+interface TimelineEvent {
+  startDate: string;  // e.g. "01/12/2020" => dd/mm/yyyy
+  endDate?: string;
+  title: string;
+  description?: string;
+  tag: 'work' | 'personal' | 'random';
+  image?: {
+    src: string;
+    alt: string;
+  };
+}
+
+interface Props {
+  events: TimelineEvent[];
+}
+
+const { events } = Astro.props;
+
+// Color classes for different tags
+const tagColors = {
+  work: 'bg-[#4A5D4F]',
+  personal: 'bg-[#4F4A5D]',
+  random: 'bg-[#5D4A4A]',
+};
+
+const tagHoverColors = {
+  work: 'group-hover:bg-[#556B5A]',
+  personal: 'group-hover:bg-[#5A556B]',
+  random: 'group-hover:bg-[#6B5555]',
+};
+
+// 1) Sort events by start date
+const sortedEvents = [...events].sort((a, b) => {
+  const dateA = new Date(a.startDate.split('/').reverse().join('/'));
+  const dateB = new Date(b.startDate.split('/').reverse().join('/'));
+  return dateA.getTime() - dateB.getTime();
+});
+
+// 2) Group events by year
+const eventsByYear: Record<number, TimelineEvent[]> = {};
+sortedEvents.forEach((evt) => {
+  const [mm, yyyy] = evt.startDate.split('/');
+  const numericYear = parseInt(yyyy, 10);
+
+  if (!eventsByYear[numericYear]) {
+    eventsByYear[numericYear] = [];
+  }
+  eventsByYear[numericYear].push(evt);
+});
+
+// 3) Determine the min & max year
+const minYear = Math.min(...Object.keys(eventsByYear).map(Number));
+const maxYear = Math.max(...Object.keys(eventsByYear).map(Number));
+
+// 4) Create an array of *all* years, including empty ones
+const allYears = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
+
+// 5) A global counter to alternate left/right for each event
+let globalEventCounter = 0;
+---
+
+<div class="relative">
+  <!-- Vertical timeline line - Left aligned on mobile, centered on desktop -->
+  <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-border md:-translate-x-1/2" />
+  
+  <!-- Timeline content -->
+  <div class="relative z-10">
+    {allYears.map((year, yearIndex) => {
+      const hasEvents = eventsByYear[year]?.length > 0;
+      
+      return (
+        <div class={`${hasEvents ? 'mb-16' : 'mb-8'}`}>
+          <!-- Year label - Full width on mobile, alternating on desktop -->
+          <div class="relative flex mb-8">
+            <div class={`
+              flex items-center
+              md:absolute md:left-1/2
+              ${yearIndex % 2 === 0 
+                ? 'md:-translate-x-[calc(100%+1rem)]' 
+                : 'md:translate-x-4'
+              }
+            `}>
+              {yearIndex % 2 === 0 ? (
+                <>
+                  <span class="text-text-muted text-sm ml-8 md:ml-0">{year}</span>
+                  <div class="w-4 h-px bg-border ml-4 hidden md:block" />
+                </>
+              ) : (
+                <>
+                  <div class="w-4 h-px bg-border mr-4 hidden md:block" />
+                  <span class="text-text-muted text-sm ml-8 md:ml-0">{year}</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <!-- Events for this year -->
+          {(eventsByYear[year] || []).map((event) => {
+            const isLeft = globalEventCounter++ % 2 === 0;
+            
+            return (
+              <div class="group relative mb-8">
+                <div class={`
+                  ml-8 mr-0 md:mr-0
+                  ${isLeft ? 'md:mr-[50%] md:pr-8' : 'md:ml-[50%] md:pl-8'}
+                `}>
+                  <div class={`${tagColors[event.tag]} transition-all duration-300 p-6 rounded-lg shadow-md ${tagHoverColors[event.tag]}`}>
+                    <div class="flex flex-col md:flex-row md:group-hover:flex-col gap-4">
+                      <div class="flex-1">
+                        <div class="text-text-muted text-sm mb-2">
+                          {event.startDate}
+                          {event.endDate && ` - ${event.endDate}`}
+                        </div>
+                        <h3 class="text-xl font-semibold text-text-primary mb-2">{event.title}</h3>
+                        {event.description && (
+                          <p class="text-text-secondary mb-4">{event.description}</p>
+                        )}
+                        <span class="inline-block px-3 py-1 text-sm rounded-full bg-black/20 text-text-primary">
+                          {event.tag}
+                        </span>
+                      </div>
+                      
+                      {event.image && (
+                        <div class="md:w-32 md:group-hover:w-full overflow-hidden">
+                          <img
+                            src={event.image.src}
+                            alt={event.image.alt}
+                            class="w-full rounded-md transition-all duration-300 object-contain"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timeline indicator - Single date events get a circle */}
+                {!event.endDate && (
+                  <div class={`
+                    absolute top-6 left-4 md:left-1/2 -translate-x-1/2 w-3 h-3 rounded-full
+                    bg-primary/20 block md:opacity-0 md:group-hover:opacity-100
+                    transition-all duration-300
+                    md:group-hover:shadow-[0_0_8px_rgba(138,163,153,0.6)]
+                  `} />
+                )}
+
+                {/* Timeline indicator - Date range events get a vertical line */}
+                {event.endDate && (
+                  <div 
+                    class={`
+                      absolute left-4 md:left-1/2 -translate-x-1/2 w-px
+                      bg-primary/20 block md:opacity-0 md:group-hover:opacity-100
+                      transition-all duration-300
+                      md:group-hover:shadow-[0_0_8px_rgba(138,163,153,0.6)]
+                    `}
+                    style={{
+                      top: '24px',
+                      bottom: '0',
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    })}
+  </div>
+</div>

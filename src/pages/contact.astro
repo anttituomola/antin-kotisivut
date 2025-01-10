@@ -1,0 +1,110 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+---
+
+<Layout title="Contact">
+  <div class="max-w-2xl mx-auto px-8 py-12">
+    <div class="mb-20 space-y-4">
+      <h1 class="text-5xl font-bold text-text-primary">Love to hear from you,</h1>
+      <p class="text-2xl text-text-secondary">Get in touch 👋</p>
+    </div>
+
+    <form id="contact-form" class="space-y-16">
+      <div class="space-y-10">
+        <div class="space-y-4">
+          <label for="name" class="block text-lg text-text-secondary">Your name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            class="w-full px-8 py-5 bg-surface border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-primary placeholder-text-muted transition-all"
+            placeholder="John Doe"
+          />
+        </div>
+
+        <div class="space-y-4">
+          <label for="email" class="block text-lg text-text-secondary">Your email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="w-full px-8 py-5 bg-surface border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-primary placeholder-text-muted transition-all"
+            placeholder="john@example.com"
+          />
+        </div>
+
+        <div class="space-y-4">
+          <label for="message" class="block text-lg text-text-secondary">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="6"
+            required
+            class="w-full px-8 py-5 bg-surface border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-primary placeholder-text-muted resize-none transition-all"
+            placeholder="please be human"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="flex flex-col items-end gap-4">
+        <Button type="submit">
+          Send Message
+        </Button>
+        <div id="form-status" class="text-text-secondary hidden"></div>
+      </div>
+    </form>
+  </div>
+</Layout>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const statusDiv = document.getElementById('form-status') as HTMLDivElement;
+  const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Disable submit button and show loading state
+    submitButton.disabled = true;
+    submitButton.textContent = 'Sending...';
+    statusDiv.textContent = '';
+    statusDiv.className = 'text-text-secondary hidden';
+
+    const formData = new FormData(form);
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      message: formData.get('message'),
+    };
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        statusDiv.textContent = 'Message sent successfully! Check your email for confirmation.';
+        statusDiv.className = 'text-status-success';
+        form.reset();
+      } else {
+        throw new Error(result.error || 'Failed to send message');
+      }
+    } catch (error) {
+      statusDiv.textContent = error instanceof Error ? error.message : 'Failed to send message';
+      statusDiv.className = 'text-status-error';
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Send Message';
+      statusDiv.classList.remove('hidden');
+    }
+  });
+</script>

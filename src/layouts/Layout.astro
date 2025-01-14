@@ -21,7 +21,7 @@ const {
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon-32x32.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
@@ -70,31 +70,36 @@ const {
               <a
                 href="/"
                 class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "" ? "bg-primary-hover/10" : ""}`}
-                >Home</a>
+                >Home</a
+              >
             </li>
             <li>
               <a
                 href="/timeline"
                 class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "timeline" ? "bg-primary-hover/10" : ""}`}
-                >Timeline</a>
+                >Timeline</a
+              >
             </li>
             <li>
               <a
                 href="/cv"
                 class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "cv" ? "bg-primary-hover/10" : ""}`}
-                >CV</a>
+                >CV</a
+              >
             </li>
             <li>
               <a
                 href="/blog"
                 class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "blog" ? "bg-primary-hover/10" : ""}`}
-                >Blog</a>
+                >Blog</a
+              >
             </li>
             <li>
               <a
                 href="/contact"
                 class={`text-text-secondary hover:text-primary-hover transition-colors py-2 px-4 rounded-md ${activePage === "contact" ? "bg-primary-hover/10" : ""}`}
-                >Contact</a>
+                >Contact</a
+              >
             </li>
           </ul>
         </div>

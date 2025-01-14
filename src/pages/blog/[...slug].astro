@@ -86,4 +86,13 @@ try {
       }
     </div>
   </article>
+
+  <script>
+    // Add target="_blank" to all links in the prose content
+    document.querySelectorAll(".prose a").forEach((link) => {
+      link.setAttribute("target", "_blank");
+      // Also add rel="noopener noreferrer" for security
+      link.setAttribute("rel", "noopener noreferrer");
+    });
+  </script>
 </Layout>

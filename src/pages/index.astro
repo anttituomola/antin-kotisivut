@@ -6,9 +6,26 @@ const posts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? !data.draft : true;
 });
 
-const featuredPosts = posts
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+// Group posts by their date (ignoring the title part)
+const groupedPosts: Record<string, typeof posts> = posts.reduce((acc, post) => {
+  // Extract just the date part: "2025-01-11"
+  const dateKey = post.slug.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? post.slug;
+  if (!acc[dateKey]) acc[dateKey] = [];
+  acc[dateKey].push(post);
+  return acc;
+}, {});
+
+// For each group, prefer English version if available, otherwise use Finnish
+const sortedPosts = Object.values(groupedPosts)
+  .map((group) => {
+    const englishPost = group.find((p) => p.data.language === "en");
+    const finnishPost = group.find((p) => p.data.language === "fi");
+    return englishPost || finnishPost;
+  })
+  .filter((post): post is NonNullable<typeof post> => post !== undefined)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const featuredPosts = sortedPosts.slice(0, 3);
 ---
 
 <Layout title="Antti Tuomola" activePage="">

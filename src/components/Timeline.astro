@@ -100,13 +100,21 @@ let globalEventCounter = 0;
             const isLeft = globalEventCounter++ % 2 === 0;
             
             return (
-              <div class="group relative mb-8">
+              <div class="group relative mb-8 hover:cursor-default">
                 <div class={`
                   ml-8 mr-0 md:mr-0
                   ${isLeft ? 'md:mr-[50%] md:pr-8' : 'md:ml-[50%] md:pl-8'}
                 `}>
-                  <div class={`${tagColors[event.tag]} transition-all duration-300 p-6 rounded-lg shadow-md ${tagHoverColors[event.tag]}`}>
-                    <div class="flex flex-col md:flex-row md:group-hover:flex-col gap-4">
+                  <div 
+                    class={`
+                      ${tagColors[event.tag]} 
+                      transition-all duration-300 
+                      p-6 rounded-lg shadow-md 
+                      ${tagHoverColors[event.tag]}
+                      group-hover:shadow-lg
+                    `}
+                  >
+                    <div class="flex flex-col md:flex-row gap-4 md:group-hover:flex-col">
                       <div class="flex-1">
                         <div class="text-text-muted text-sm mb-2">
                           {event.startDate}
@@ -122,11 +130,18 @@ let globalEventCounter = 0;
                       </div>
                       
                       {event.image && (
-                        <div class="md:w-32 md:group-hover:w-full overflow-hidden">
+                        <div 
+                          class="
+                            md:w-32 
+                            md:group-hover:w-full 
+                            overflow-hidden 
+                            transition-all duration-300
+                          "
+                        >
                           <img
                             src={event.image.src}
                             alt={event.image.alt}
-                            class="w-full rounded-md transition-all duration-300 object-contain"
+                            class="w-full rounded-md object-contain"
                           />
                         </div>
                       )}
@@ -136,12 +151,17 @@ let globalEventCounter = 0;
 
                 {/* Timeline indicator - Single date events get a circle */}
                 {!event.endDate && (
-                  <div class={`
-                    absolute top-6 left-4 md:left-1/2 -translate-x-1/2 w-3 h-3 rounded-full
-                    bg-primary/20 block md:opacity-0 md:group-hover:opacity-100
-                    transition-all duration-300
-                    md:group-hover:shadow-[0_0_8px_rgba(138,163,153,0.6)]
-                  `} />
+                  <div 
+                    class={`
+                      absolute top-6 left-4 md:left-1/2 -translate-x-1/2 
+                      w-3 h-3 rounded-full
+                      bg-primary/20 block 
+                      md:opacity-0 md:group-hover:opacity-100
+                      transition-all duration-300
+                      md:group-hover:shadow-[0_0_8px_rgba(138,163,153,0.6)]
+                      pointer-events-none
+                    `} 
+                  />
                 )}
 
                 {/* Timeline indicator - Date range events get a vertical line */}
@@ -149,9 +169,11 @@ let globalEventCounter = 0;
                   <div 
                     class={`
                       absolute left-4 md:left-1/2 -translate-x-1/2 w-px
-                      bg-primary/20 block md:opacity-0 md:group-hover:opacity-100
+                      bg-primary/20 block 
+                      md:opacity-0 md:group-hover:opacity-100
                       transition-all duration-300
                       md:group-hover:shadow-[0_0_8px_rgba(138,163,153,0.6)]
+                      pointer-events-none
                     `}
                     style={{
                       top: '24px',

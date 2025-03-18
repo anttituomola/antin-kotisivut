@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import essaysRouter from "./routes/essays";
 
 // Define custom interface for authenticated requests
 interface AuthRequest extends Request {
@@ -24,7 +25,11 @@ app.use(
     origin:
       process.env.NODE_ENV === "production"
         ? "https://toolbox.anttituomola.fi"
-        : "http://localhost:5173",
+        : [
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:5175", // Adding multiple potential dev ports
+          ],
     credentials: true,
   })
 );
@@ -113,6 +118,9 @@ app.get("/api/auth/status", authenticate, (req: AuthRequest, res: Response) => {
 app.get("/api/protected", authenticate, (req: AuthRequest, res: Response) => {
   res.json({ message: "This is protected data", user: req.user });
 });
+
+// Use essay routes
+app.use("/api/essays", authenticate, essaysRouter);
 
 // Start the server
 app.listen(PORT, () => {

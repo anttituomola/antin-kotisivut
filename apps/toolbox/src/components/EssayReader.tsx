@@ -152,7 +152,9 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
   const [view, setView] = useState<"create" | "list">("create");
 
   // API base URL
-  const API_BASE_URL = "http://localhost:3001"; // Use environment variable in production
+  const API_BASE_URL = import.meta.env.DEV
+    ? "http://localhost:3001"
+    : "https://api.anttituomola.fi";
 
   const fetchEssays = async () => {
     setIsLoading(true);

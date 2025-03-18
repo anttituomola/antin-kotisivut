@@ -1,30 +1,16 @@
 {
-  "name": "personal-website",
-  "type": "module",
-  "version": "0.0.1",
+  "name": "antin-kotisivut",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "newpost": "node createPost.js"
-  },
-  "dependencies": {
-    "@astrojs/mdx": "^4.0.5",
-    "@astrojs/react": "^3.0.10",
-    "@astrojs/tailwind": "^5.1.0",
-    "@astrojs/vercel": "^8.0.1",
-    "@aws-sdk/client-ses": "^3.726.1",
-    "@fontsource/inter": "^5.0.17",
-    "@tailwindcss/typography": "^0.5.10",
-    "@types/react": "^18.2.61",
-    "@types/react-dom": "^18.2.19",
-    "astro": "^5.1.5",
-    "country-flag-icons": "^1.5.16",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tailwindcss": "^3.4.1"
+    "dev": "npm run dev --workspace=website",
+    "build": "npm run build --workspace=website",
+    "preview": "npm run preview --workspace=website",
+    "toolbox:dev": "npm run dev --workspace=toolbox",
+    "toolbox:build": "npm run build --workspace=toolbox",
+    "toolbox:preview": "npm run preview --workspace=toolbox"
   }
 }

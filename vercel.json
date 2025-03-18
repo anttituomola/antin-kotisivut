@@ -3,6 +3,9 @@
   "outputDirectory": "apps/website/dist",
   "framework": "astro",
   "installCommand": "echo 'Skipping root install'",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/apps/website/dist/$1" }
+  ],
   "git": {
     "deploymentEnabled": {
       "main": true

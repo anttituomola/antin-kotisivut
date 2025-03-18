@@ -11,6 +11,11 @@
     "preview": "npm run preview --workspace=website",
     "toolbox:dev": "npm run dev --workspace=toolbox",
     "toolbox:build": "npm run build --workspace=toolbox",
-    "toolbox:preview": "npm run preview --workspace=toolbox"
+    "toolbox:preview": "npm run preview --workspace=toolbox",
+    "toolbox:api": "cd apps/toolbox/api && npm run dev",
+    "toolbox:dev:all": "npx concurrently \"npm run toolbox:dev\" \"npm run toolbox:api\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

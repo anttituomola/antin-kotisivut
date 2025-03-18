@@ -1,8 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "framework": null,
+  "buildCommand": "cd apps/website && npm install && npm run build",
   "outputDirectory": "apps/website/dist",
+  "framework": null,
+  "installCommand": "echo 'Skipping root install'",
   "git": {
     "deploymentEnabled": {
       "main": true

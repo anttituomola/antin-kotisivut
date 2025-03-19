@@ -151,7 +151,7 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<"create" | "list">("create");
 
-  // API base URL
+  // API base URL - for essays, use api.anttituomola.fi
   const API_BASE_URL = import.meta.env.DEV
     ? "http://localhost:3001"
     : "https://api.anttituomola.fi";
@@ -161,6 +161,13 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/essays`, {
         credentials: "include",
+        headers: {
+          // Get the token from the cookie and include it in the Authorization header
+          Authorization: `Bearer ${document.cookie.replace(
+            /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+            "$1"
+          )}`,
+        },
       });
 
       if (!response.ok) {
@@ -185,6 +192,12 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/essays/${id}`, {
         credentials: "include",
+        headers: {
+          Authorization: `Bearer ${document.cookie.replace(
+            /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+            "$1"
+          )}`,
+        },
       });
 
       if (!response.ok) {
@@ -212,6 +225,10 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${document.cookie.replace(
+            /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+            "$1"
+          )}`,
         },
         body: JSON.stringify({ voiceId: selectedVoiceId }),
         credentials: "include",
@@ -249,6 +266,10 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${document.cookie.replace(
+            /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+            "$1"
+          )}`,
         },
         body: JSON.stringify({
           title,

@@ -33,7 +33,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     res.setHeader("Set-Cookie", cookieStr);
     return res.status(200).json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Logout error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }

@@ -9,7 +9,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     "https://toolbox.anttituomola.fi"
   );
   res.setHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Cookie");
 
   // Handle OPTIONS preflight request
   if (req.method === "OPTIONS") {
@@ -21,15 +21,20 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  // Clear the token cookie
-  const cookieStr = cookie.serialize("token", "", {
-    httpOnly: true,
-    secure: true,
-    expires: new Date(0), // Set expiry to the past
-    sameSite: "none",
-    path: "/",
-  });
+  try {
+    // Clear the token cookie
+    const cookieStr = cookie.serialize("token", "", {
+      httpOnly: true,
+      secure: true,
+      expires: new Date(0), // Set expiry to the past
+      sameSite: "none",
+      path: "/",
+    });
 
-  res.setHeader("Set-Cookie", cookieStr);
-  return res.status(200).json({ success: true });
+    res.setHeader("Set-Cookie", cookieStr);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 }

@@ -3,19 +3,6 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookie from "cookie";
 
-// In-memory storage for password hash
-let hashedPassword = "";
-
-// Initialize the password hash
-(async () => {
-  if (process.env.AUTH_PASSWORD) {
-    hashedPassword = await bcrypt.hash(process.env.AUTH_PASSWORD, 10);
-    console.log("Password hash initialized");
-  } else {
-    console.error("AUTH_PASSWORD environment variable not set");
-  }
-})();
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -45,34 +32,62 @@ export default async function handler(
     return res.status(400).json({ message: "Username and password required" });
   }
 
-  // Skip actual password check in development if needed
-  const skipAuth = process.env.SKIP_AUTH === "true";
-  const passwordMatches =
-    skipAuth ||
-    (username === process.env.AUTH_USERNAME &&
-      (await bcrypt.compare(password, hashedPassword)));
-
-  if (passwordMatches) {
-    // Create JWT token
-    const token = jwt.sign(
-      { username },
-      process.env.JWT_SECRET || "fallback_secret",
-      { expiresIn: "7d" }
+  // For debugging purposes - check if environment variables are set
+  if (!process.env.AUTH_USERNAME || !process.env.AUTH_PASSWORD) {
+    console.error(
+      "Missing AUTH_USERNAME or AUTH_PASSWORD environment variables"
     );
-
-    // Set token as a cookie
-    const cookieStr = cookie.serialize("token", token, {
-      httpOnly: true,
-      secure: true,
-      maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
-      sameSite: "none",
-      path: "/",
-    });
-
-    res.setHeader("Set-Cookie", cookieStr);
-    return res.status(200).json({ success: true });
+    // Return a more specific error in development
+    if (process.env.NODE_ENV !== "production") {
+      return res.status(500).json({
+        message:
+          "Server configuration error: Missing authentication credentials",
+        debug: {
+          authUsernameDefined: !!process.env.AUTH_USERNAME,
+          authPasswordDefined: !!process.env.AUTH_PASSWORD,
+        },
+      });
+    }
+    return res.status(401).json({ message: "Invalid credentials" });
   }
 
-  // Auth failed
-  return res.status(401).json({ message: "Invalid credentials" });
+  const correctUsername = process.env.AUTH_USERNAME;
+  const correctPassword = process.env.AUTH_PASSWORD;
+
+  try {
+    // Verify username first
+    if (username !== correctUsername) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Then verify password - compare plain text since we're passing the password directly
+    const passwordMatches = password === correctPassword;
+
+    if (passwordMatches) {
+      // Create JWT token
+      const token = jwt.sign(
+        { username },
+        process.env.JWT_SECRET || "fallback_secret",
+        { expiresIn: "7d" }
+      );
+
+      // Set token as a cookie
+      const cookieStr = cookie.serialize("token", token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+        sameSite: "none",
+        path: "/",
+      });
+
+      res.setHeader("Set-Cookie", cookieStr);
+      return res.status(200).json({ success: true });
+    }
+
+    // Auth failed
+    return res.status(401).json({ message: "Invalid credentials" });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 }

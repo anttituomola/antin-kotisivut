@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
+// Use a CommonJS compatible import for node-fetch
 import fetch from "node-fetch";
 
 // Import essay interface and essays array from the main essays endpoint

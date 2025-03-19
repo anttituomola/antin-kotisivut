@@ -151,128 +151,23 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<"create" | "list">("create");
 
-  // API base URL - for essays, use api.anttituomola.fi
+  // API base URL
   const API_BASE_URL = import.meta.env.DEV
     ? "http://localhost:3001"
-    : "https://api.anttituomola.fi";
-
-  // AuthContext is for the Vercel API, but we need direct PocketBase auth for essays
-  const [pbToken, setPbToken] = useState<string>("");
-
-  // Get auth token from AuthContext jwt cookie
-  const getAuthToken = () => {
-    const tokenMatch = document.cookie.match(/token=([^;]+)/);
-    return tokenMatch ? tokenMatch[1] : "";
-  };
-
-  // Authenticate directly with PocketBase for essay operations
-  const authenticateWithPocketBase = async () => {
-    try {
-      // Use environment variables for credentials - these should be the same as what the API uses
-      const pbEmail = "antti.tuomola@gmail.com"; // Hardcode for now, replace with proper config later
-      const pbPassword = "secureP8ssword"; // Hardcode for now, replace with proper config later
-
-      console.log("Authenticating with PocketBase");
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/collections/users/auth-with-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            identity: pbEmail,
-            password: pbPassword,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        console.error(
-          "PocketBase auth failed:",
-          response.status,
-          response.statusText
-        );
-        throw new Error(
-          `PocketBase auth failed: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-      console.log("PocketBase auth success, token received");
-      setPbToken(data.token);
-      return data.token;
-    } catch (error) {
-      console.error("PocketBase auth error:", error);
-      return null;
-    }
-  };
-
-  // Initialize PocketBase auth when component mounts
-  useEffect(() => {
-    authenticateWithPocketBase();
-  }, []);
+    : "https://toolbox.anttituomola.fi";
 
   const fetchEssays = async () => {
     setIsLoading(true);
     try {
-      let token = pbToken;
-
-      // If we don't have a token yet, try to authenticate
-      if (!token) {
-        token = await authenticateWithPocketBase();
-        if (!token) {
-          throw new Error("Failed to authenticate with PocketBase");
-        }
-      }
-
-      console.log(
-        "Using PB token for fetch:",
-        token ? "Token found" : "No token"
-      );
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/collections/essays/records?sort=-created`,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/essays`, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
-        // If unauthorized, try to re-authenticate
-        if (response.status === 401) {
-          const newToken = await authenticateWithPocketBase();
-          if (newToken) {
-            // Retry with new token
-            const retryResponse = await fetch(
-              `${API_BASE_URL}/api/collections/essays/records?sort=-created`,
-              {
-                headers: {
-                  Authorization: `Bearer ${newToken}`,
-                },
-              }
-            );
-
-            if (retryResponse.ok) {
-              const data = await retryResponse.json();
-              console.log("Fetched essay data after token refresh:", data);
-              setEssays(data.items || []);
-              setIsLoading(false);
-              return;
-            }
-          }
-        }
-
-        throw new Error(
-          `Failed to fetch essays: ${response.status} ${response.statusText}`
-        );
+        throw new Error("Failed to fetch essays");
       }
 
       const data = await response.json();
-      console.log("Fetched essay data:", data);
       setEssays(data.items || []);
     } catch (error) {
       console.error("Error fetching essays:", error);
@@ -288,51 +183,12 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
 
   const fetchEssayDetails = async (id: string) => {
     try {
-      let token = pbToken;
-
-      // If we don't have a token yet, try to authenticate
-      if (!token) {
-        token = await authenticateWithPocketBase();
-        if (!token) {
-          throw new Error("Failed to authenticate with PocketBase");
-        }
-      }
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/collections/essays/records/${id}`,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/essays/${id}`, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
-        // If unauthorized, try to re-authenticate
-        if (response.status === 401) {
-          const newToken = await authenticateWithPocketBase();
-          if (newToken) {
-            // Retry with new token
-            const retryResponse = await fetch(
-              `${API_BASE_URL}/api/collections/essays/records/${id}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${newToken}`,
-                },
-              }
-            );
-
-            if (retryResponse.ok) {
-              const data = await retryResponse.json();
-              setSelectedEssay(data);
-              return;
-            }
-          }
-        }
-
-        throw new Error(
-          `Failed to fetch essay details: ${response.status} ${response.statusText}`
-        );
+        throw new Error("Failed to fetch essay details");
       }
 
       const data = await response.json();
@@ -352,27 +208,17 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
     selectedVoiceId: string = voiceId
   ) => {
     try {
-      // For now, we'll have to go through the Vercel API for processing
-      // This will need to be updated later when this endpoint is moved to PocketBase
-      const token = getAuthToken();
-
       const response = await fetch(`${API_BASE_URL}/api/essays/${id}/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ voiceId: selectedVoiceId }),
         credentials: "include",
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(
-          `Failed to trigger processing: ${response.status} ${
-            response.statusText
-          }${errorData ? ` - ${JSON.stringify(errorData)}` : ""}`
-        );
+        throw new Error("Failed to trigger processing");
       }
 
       setMessage("Audio processing started. This may take a minute...");
@@ -387,108 +233,54 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
     }
   };
 
-  // Handle form submission - create a new essay
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!content.trim()) {
+      setMessage("Please enter some text");
+      return;
+    }
+
     setIsSubmitting(true);
     setMessage("");
 
     try {
-      let token = pbToken;
-
-      // If we don't have a token yet, try to authenticate
-      if (!token) {
-        token = await authenticateWithPocketBase();
-        if (!token) {
-          throw new Error("Failed to authenticate with PocketBase");
-        }
-      }
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/collections/essays/records`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify({
-            title: title || "Untitled Essay",
-            content,
-            status: "pending",
-            audio_file_id: "",
-            voiceId: voiceId || "Matthew",
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/essays`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          content,
+          voiceId, // Include selected voice
+        }),
+        credentials: "include",
+      });
 
       if (!response.ok) {
-        // If unauthorized, try to re-authenticate
-        if (response.status === 401) {
-          const newToken = await authenticateWithPocketBase();
-          if (newToken) {
-            // Retry with new token
-            const retryResponse = await fetch(
-              `${API_BASE_URL}/api/collections/essays/records`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${newToken}`,
-                },
-                body: JSON.stringify({
-                  title: title || "Untitled Essay",
-                  content,
-                  status: "pending",
-                  audio_file_id: "",
-                  voiceId: voiceId || "Matthew",
-                }),
-              }
-            );
-
-            if (retryResponse.ok) {
-              const data = await retryResponse.json();
-              setTitle("");
-              setContent("");
-              setMessage(
-                "Essay submitted successfully. Now processing for audio..."
-              );
-
-              // Trigger the essay processing
-              triggerProcessing(data.id, voiceId);
-
-              setView("list");
-              fetchEssays(); // Refresh the list after submitting
-              return;
-            }
-          }
-        }
-
-        const errorData = await response.json().catch(() => null);
-        throw new Error(
-          `Failed to submit essay: ${response.status} ${response.statusText}${
-            errorData ? ` - ${JSON.stringify(errorData)}` : ""
-          }`
-        );
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to submit essay");
       }
 
       const data = await response.json();
+
+      setMessage("Essay submitted successfully and audio processing started!");
       setTitle("");
       setContent("");
-      setMessage("Essay submitted successfully. Now processing for audio...");
 
-      // Trigger the essay processing
-      triggerProcessing(data.id, voiceId);
-
-      setView("list");
-      fetchEssays(); // Refresh the list after submitting
+      // Fetch the newly created essay after a delay to allow for processing
+      setTimeout(() => {
+        fetchEssays();
+        setView("list");
+      }, 1000);
     } catch (error) {
-      console.error("Essay submission error:", error);
       setMessage(
-        `Error submitting essay: ${
+        `An error occurred while submitting your essay: ${
           error instanceof Error ? error.message : "Unknown error"
         }`
       );
+      console.error("Essay submission error:", error);
     } finally {
       setIsSubmitting(false);
     }

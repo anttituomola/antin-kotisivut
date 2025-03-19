@@ -154,7 +154,7 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
   // API base URL
   const API_BASE_URL = import.meta.env.DEV
     ? "http://localhost:3001"
-    : "https://api.anttituomola.fi";
+    : "https://toolbox.anttituomola.fi";
 
   const fetchEssays = async () => {
     setIsLoading(true);

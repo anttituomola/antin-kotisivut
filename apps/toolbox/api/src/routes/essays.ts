@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import fetch from "node-fetch";
 import path from "path";
 import fs from "fs";
+import FormData from "form-data";
 import {
   textToSpeech,
   saveAudioToFile,
@@ -34,18 +35,14 @@ interface PocketbaseEssayRecord {
 }
 
 // Pocketbase configuration
-const pocketbaseUrl = process.env.POCKETBASE_URL;
+const pocketbaseUrl =
+  process.env.POCKETBASE_URL || "https://api.anttituomola.fi";
 const pocketbaseEmail = process.env.POCKETBASE_ADMIN_EMAIL;
 const pocketbasePassword = process.env.POCKETBASE_ADMIN_PASSWORD;
 
 // Validate required environment variables
-if (!pocketbaseUrl || !pocketbaseEmail || !pocketbasePassword) {
+if (!pocketbaseEmail || !pocketbasePassword) {
   console.error("ERROR: Missing required Pocketbase environment variables");
-  console.error(
-    `POCKETBASE_URL=${pocketbaseUrl}, POCKETBASE_ADMIN_EMAIL=${pocketbaseEmail}, POCKETBASE_ADMIN_PASSWORD=${
-      pocketbasePassword ? "[SET]" : "[NOT SET]"
-    }`
-  );
 }
 
 console.log(`Connecting to Pocketbase at: ${pocketbaseUrl}`);
@@ -53,58 +50,57 @@ console.log(`Connecting to Pocketbase at: ${pocketbaseUrl}`);
 // Function to authenticate with Pocketbase
 async function authenticateWithPocketbase() {
   try {
-    // Get token from regular user account
-    const authUrl = `${pocketbaseUrl}/api/collections/users/auth-with-password`;
-    console.log(`Authenticating with Pocketbase at ${authUrl}`);
+    // Try authenticating with users collection
+    try {
+      const authUrl = `${pocketbaseUrl}/api/collections/users/auth-with-password`;
+      console.log(`Authenticating with Pocketbase at ${authUrl}`);
 
-    const response = await fetch(authUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        identity: pocketbaseEmail,
-        password: pocketbasePassword,
-      }),
-    });
+      const response = await fetch(authUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identity: pocketbaseEmail,
+          password: pocketbasePassword,
+        }),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log("User authentication successful");
-      return data.token;
+      if (response.ok) {
+        const data = await response.json();
+        console.log("User authentication successful");
+        return data.token;
+      }
+    } catch (userAuthError) {
+      console.error("User auth error:", userAuthError);
     }
 
-    // If regular auth fails, try getting a token by creating a refresh token
-    console.log("Standard authentication failed, trying direct admin token");
+    // If that fails, try with staff collection
+    try {
+      const altAuthUrl = `${pocketbaseUrl}/api/collections/staff/auth-with-password`;
+      console.log(`Trying alternative authentication at ${altAuthUrl}`);
 
-    // Try with different user collection name
-    const altAuthUrl = `${pocketbaseUrl}/api/collections/staff/auth-with-password`;
-    console.log(`Trying alternative authentication at ${altAuthUrl}`);
+      const altResponse = await fetch(altAuthUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identity: pocketbaseEmail,
+          password: pocketbasePassword,
+        }),
+      });
 
-    const altResponse = await fetch(altAuthUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        identity: pocketbaseEmail,
-        password: pocketbasePassword,
-      }),
-    });
-
-    if (altResponse.ok) {
-      const altData = await altResponse.json();
-      console.log("Alternative authentication successful");
-      return altData.token;
+      if (altResponse.ok) {
+        const altData = await altResponse.json();
+        console.log("Alternative authentication successful");
+        return altData.token;
+      }
+    } catch (staffAuthError) {
+      console.error("Staff auth error:", staffAuthError);
     }
 
-    // As a last resort, try authenticating directly via login form
-    console.log(
-      "All API authentication methods failed. We need to create a proper user account in PocketBase."
-    );
-
-    const errorText = await response.text();
-    console.error(`Authentication failed: ${errorText}`);
+    console.error("All authentication methods failed");
     return null;
   } catch (error) {
     console.error("Pocketbase authentication error:", error);
@@ -144,20 +140,12 @@ router.get("/", async (req: Request, res: Response) => {
 
     const essays = await response.json();
 
-    // Process each essay to check for audio files
+    // Process each essay to add audioUrl if needed
     if (essays.items && Array.isArray(essays.items)) {
       for (const essay of essays.items) {
         if (essay.audio_file_id && essay.status === "completed") {
-          // If we're storing audio files locally
-          const audioPath = path.join(
-            __dirname,
-            "../../uploads",
-            `${essay.id}.mp3`
-          );
-
-          if (fs.existsSync(audioPath)) {
-            essay.audioUrl = `/api/essays/${essay.id}/audio`;
-          }
+          // Add a direct link to the audio file
+          essay.audioUrl = `/api/essays/${essay.id}/audio`;
         }
       }
     }
@@ -167,6 +155,55 @@ router.get("/", async (req: Request, res: Response) => {
     console.error("Error listing essays:", error);
     return res.status(500).json({
       message: "Failed to list essays",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+});
+
+// GET endpoint to fetch a specific essay
+router.get("/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Authenticate with Pocketbase
+    const token = await authenticateWithPocketbase();
+
+    if (!token) {
+      return res.status(401).json({
+        message: "Authentication failed.",
+      });
+    }
+
+    // Fetch essay from Pocketbase
+    const essayUrl = `${pocketbaseUrl}/api/collections/essays/records/${id}`;
+    console.log(`Fetching essay from: ${essayUrl}`);
+
+    const response = await fetch(essayUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Get essay failed: ${errorText}`);
+      return res.status(response.status).json({
+        message: `Failed to get essay: ${response.statusText}`,
+      });
+    }
+
+    const essay = await response.json();
+
+    // Add audioUrl if audio file exists
+    if (essay.audio_file_id && essay.status === "completed") {
+      essay.audioUrl = `/api/essays/${essay.id}/audio`;
+    }
+
+    return res.json(essay);
+  } catch (error) {
+    console.error("Error getting essay:", error);
+    return res.status(500).json({
+      message: "Failed to get essay",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -186,8 +223,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!token) {
       return res.status(401).json({
-        message:
-          "Authentication failed. Please set up a user account in PocketBase with access to the essays collection.",
+        message: "Authentication failed.",
       });
     }
 
@@ -212,39 +248,23 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!createResponse.ok) {
       const errorText = await createResponse.text();
-      console.error(
-        `Create essay failed with status ${createResponse.status}: ${errorText}`
-      );
-      throw new Error(`Failed to create essay: ${createResponse.statusText}`);
+      console.error(`Create essay failed: ${errorText}`);
+      return res.status(createResponse.status).json({
+        message: `Failed to create essay: ${createResponse.statusText}`,
+      });
     }
 
     const essay = await createResponse.json();
     console.log(`Essay created with ID: ${essay.id}`);
 
-    // Queue the essay for processing with Amazon Polly (in a real app, use a job queue)
-    // Instead, we'll trigger processing immediately for this example
-    try {
-      // Process with Amazon Polly in the background
-      processEssayWithPolly(essay.id, content, token, voiceId);
+    // Process with Amazon Polly in the background
+    processEssayWithPolly(essay.id, content, token, voiceId || "Matthew");
 
-      // Return a success response to the client immediately
-      return res.status(201).json({
-        message: "Essay created successfully and queued for audio processing",
-        essayId: essay.id,
-      });
-    } catch (processError) {
-      console.error("Error queuing essay for processing:", processError);
-      // Still return a 201 since the essay was created successfully
-      return res.status(201).json({
-        message:
-          "Essay created successfully, but audio processing failed to start",
-        essayId: essay.id,
-        audioError:
-          processError instanceof Error
-            ? processError.message
-            : "Unknown error",
-      });
-    }
+    // Return a success response to the client immediately
+    return res.status(201).json({
+      message: "Essay created successfully and queued for audio processing",
+      essayId: essay.id,
+    });
   } catch (error) {
     console.error("Error creating essay:", error);
     return res.status(500).json({
@@ -254,95 +274,11 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
-// GET endpoint to retrieve a specific essay by ID
-router.get("/:id", async (req: Request, res: Response) => {
-  try {
-    const essayId = req.params.id;
-
-    // Authenticate with Pocketbase
-    const token = await authenticateWithPocketbase();
-
-    if (!token) {
-      return res.status(401).json({
-        message: "Authentication failed.",
-      });
-    }
-
-    // Fetch the essay from Pocketbase
-    const getUrl = `${pocketbaseUrl}/api/collections/essays/records/${essayId}`;
-    const response = await fetch(getUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Get essay failed: ${errorText}`);
-      return res.status(response.status).json({
-        message: `Failed to retrieve essay: ${response.statusText}`,
-      });
-    }
-
-    const essay = await response.json();
-
-    // Check if audio file exists
-    if (essay.audio_file_id && essay.status === "completed") {
-      // If we're storing audio files locally
-      const audioPath = path.join(
-        __dirname,
-        "../../uploads",
-        `${essay.id}.mp3`
-      );
-
-      if (fs.existsSync(audioPath)) {
-        essay.audioUrl = `/api/essays/${essay.id}/audio`;
-      }
-    }
-
-    return res.json(essay);
-  } catch (error) {
-    console.error("Error retrieving essay:", error);
-    return res.status(500).json({
-      message: "Failed to retrieve essay",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
-  }
-});
-
-// GET endpoint to stream audio for an essay
-router.get("/:id/audio", async (req: Request, res: Response) => {
-  try {
-    const essayId = req.params.id;
-
-    // Path to the audio file
-    const audioPath = path.join(__dirname, "../../uploads", `${essayId}.mp3`);
-
-    // Check if the file exists
-    if (!fs.existsSync(audioPath)) {
-      return res.status(404).json({ message: "Audio file not found" });
-    }
-
-    // Set the content type for MP3
-    res.setHeader("Content-Type", "audio/mpeg");
-
-    // Stream the file
-    const audioStream = fs.createReadStream(audioPath);
-    audioStream.pipe(res);
-  } catch (error) {
-    console.error("Error streaming audio:", error);
-    return res.status(500).json({
-      message: "Failed to stream audio",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
-  }
-});
-
-// POST endpoint to manually trigger audio processing for an essay
+// POST endpoint to trigger audio processing
 router.post("/:id/process", async (req: Request, res: Response) => {
   try {
-    const essayId = req.params.id;
-    const { voiceId } = req.body || {};
+    const { id } = req.params;
+    const { voiceId } = req.body;
 
     // Authenticate with Pocketbase
     const token = await authenticateWithPocketbase();
@@ -353,9 +289,9 @@ router.post("/:id/process", async (req: Request, res: Response) => {
       });
     }
 
-    // Fetch the essay from Pocketbase
-    const getUrl = `${pocketbaseUrl}/api/collections/essays/records/${essayId}`;
-    const response = await fetch(getUrl, {
+    // Fetch essay from Pocketbase to get content
+    const essayUrl = `${pocketbaseUrl}/api/collections/essays/records/${id}`;
+    const response = await fetch(essayUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -363,58 +299,106 @@ router.post("/:id/process", async (req: Request, res: Response) => {
 
     if (!response.ok) {
       return res.status(response.status).json({
-        message: `Failed to retrieve essay: ${response.statusText}`,
+        message: `Failed to get essay: ${response.statusText}`,
       });
     }
 
     const essay = await response.json();
 
-    // If a new voice ID is provided, update the essay with it
+    // Update voiceId if a new one is provided
     if (voiceId && voiceId !== essay.voiceId) {
-      const updateUrl = `${pocketbaseUrl}/api/collections/essays/records/${essayId}`;
-      const updateResponse = await fetch(updateUrl, {
+      const updateUrl = `${pocketbaseUrl}/api/collections/essays/records/${id}`;
+      await fetch(updateUrl, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          voiceId,
+          voiceId: voiceId,
         }),
       });
-
-      if (!updateResponse.ok) {
-        console.error("Failed to update essay with new voice ID");
-      } else {
-        console.log(`Updated essay ${essayId} with voice ID: ${voiceId}`);
-      }
     }
 
-    // Start processing in the background
-    try {
-      // Use provided voiceId, essay's voiceId, or default to Matthew
-      const selectedVoiceId = voiceId || essay.voiceId || "Matthew";
-      processEssayWithPolly(essay.id, essay.content, token, selectedVoiceId);
+    // Process with the selected voice or the existing one
+    const selectedVoice = voiceId || essay.voiceId || "Matthew";
+    processEssayWithPolly(id, essay.content, token, selectedVoice);
 
-      return res.json({
-        message: "Audio processing started",
-        essayId: essay.id,
-        voiceId: selectedVoiceId,
-      });
-    } catch (processError) {
-      console.error("Error starting audio processing:", processError);
-      return res.status(500).json({
-        message: "Failed to start audio processing",
-        error:
-          processError instanceof Error
-            ? processError.message
-            : "Unknown error",
-      });
-    }
+    return res.status(200).json({
+      message: "Essay audio processing started",
+      essayId: id,
+    });
   } catch (error) {
     console.error("Error processing essay:", error);
     return res.status(500).json({
       message: "Failed to process essay",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+});
+
+// GET endpoint to serve the audio file
+router.get("/:id/audio", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Authenticate with Pocketbase
+    const token = await authenticateWithPocketbase();
+
+    if (!token) {
+      return res.status(401).json({
+        message: "Authentication failed.",
+      });
+    }
+
+    // Fetch essay from Pocketbase to get audio_file_id
+    const essayUrl = `${pocketbaseUrl}/api/collections/essays/records/${id}`;
+    const response = await fetch(essayUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        message: `Failed to get essay: ${response.statusText}`,
+      });
+    }
+
+    const essay = await response.json();
+
+    if (!essay.audio_file_id) {
+      return res.status(404).json({
+        message: "Audio file not found for this essay",
+      });
+    }
+
+    // Get the audio file from PocketBase
+    const audioUrl = `${pocketbaseUrl}/api/files/essays/${id}/${essay.audio_file_id}`;
+    const audioResponse = await fetch(audioUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!audioResponse.ok) {
+      return res.status(audioResponse.status).json({
+        message: `Failed to fetch audio file: ${audioResponse.statusText}`,
+      });
+    }
+
+    // Get the content type from the response
+    const contentType =
+      audioResponse.headers.get("content-type") || "audio/mpeg";
+
+    // Pipe the audio data to the response
+    res.setHeader("Content-Type", contentType);
+    const audioBuffer = await audioResponse.buffer();
+    res.send(audioBuffer);
+  } catch (error) {
+    console.error("Error serving audio:", error);
+    return res.status(500).json({
+      message: "Failed to serve audio file",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -428,42 +412,108 @@ async function processEssayWithPolly(
   voiceId: string = "Matthew"
 ) {
   try {
-    console.log(
-      `Starting audio processing for essay ${essayId} with voice ${voiceId}`
-    );
+    console.log(`Processing essay ${essayId} with voice ${voiceId}`);
 
-    // Check if the selected voice is one that supports generative engine
-    const generativeVoices = [
-      "Amy",
-      "Arthur",
-      "Brian",
-      "Danielle",
-      "Emma",
-      "Gabrielle",
-      "Kajal",
-      "Stephen",
-    ];
-    const useGenerative = generativeVoices.includes(voiceId);
-
-    // Convert text to speech
-    const audioBuffer = await textToSpeech(content, {
-      voiceId: voiceId as any,
-      useGenerative: useGenerative, // Use generative engine for supported voices
+    // Update essay status to "processing"
+    const updateUrl = `${pocketbaseUrl}/api/collections/essays/records/${essayId}`;
+    await fetch(updateUrl, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        status: "processing",
+      }),
     });
 
-    // Save the audio file
-    const fileName = `${essayId}.mp3`;
-    const filePath = saveAudioToFile(audioBuffer, fileName);
+    // Generate audio with Amazon Polly - use TextType=ssml for long-form
+    const isLongFormVoice = [
+      "Matthew",
+      "Joanna",
+      "Lupe",
+      "Ruth",
+      "Stephen",
+      "Kevin",
+    ].includes(voiceId);
+    const audioData = await textToSpeech(content, voiceId, isLongFormVoice);
 
-    console.log(`Audio saved to ${filePath}`);
+    if (!audioData) {
+      throw new Error("Failed to generate audio");
+    }
 
-    // Update the essay in PocketBase
-    await updateEssayWithAudio(essayId, fileName, pocketbaseUrl || "", token);
+    // Save audio to a temporary file
+    const audioFilePath = path.join(
+      __dirname,
+      "../../uploads",
+      `${essayId}.mp3`
+    );
+    const audioDir = path.dirname(audioFilePath);
 
-    console.log(`Audio processing completed for essay ${essayId}`);
+    // Create the directory if it doesn't exist
+    if (!fs.existsSync(audioDir)) {
+      fs.mkdirSync(audioDir, { recursive: true });
+    }
+
+    await saveAudioToFile(audioData, audioFilePath);
+
+    // Upload the audio file to PocketBase using the proper FormData implementation
+    const formData = new FormData();
+    formData.append("audio", audioData, {
+      filename: `${essayId}.mp3`,
+      contentType: "audio/mpeg",
+    });
+
+    const fileUrl = `${pocketbaseUrl}/api/files/essays/${essayId}`;
+    const fileResponse = await fetch(fileUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...formData.getHeaders(), // Add the form-data headers
+      },
+      body: formData,
+    });
+
+    if (!fileResponse.ok) {
+      const errorText = await fileResponse.text();
+      console.error(`Upload audio failed: ${errorText}`);
+      throw new Error(`Failed to upload audio: ${fileResponse.statusText}`);
+    }
+
+    const fileData = await fileResponse.json();
+    const audioFileId = fileData.id;
+
+    // Update essay with audio file ID and set status to completed
+    await fetch(updateUrl, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        audio_file_id: audioFileId,
+        status: "completed",
+      }),
+    });
+
+    console.log(
+      `Essay ${essayId} processed successfully with audio ID: ${audioFileId}`
+    );
   } catch (error) {
-    console.error(`Error processing essay ${essayId} with Polly:`, error);
-    throw error;
+    console.error(`Error processing essay ${essayId}:`, error);
+
+    // Update essay status to "error"
+    const updateUrl = `${pocketbaseUrl}/api/collections/essays/records/${essayId}`;
+    await fetch(updateUrl, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        status: "error",
+      }),
+    });
   }
 }
 

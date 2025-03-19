@@ -151,23 +151,26 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<"create" | "list">("create");
 
-  // API base URL
-  const API_BASE_URL = import.meta.env.DEV
+  // Use only Vercel API routes for all environments
+  const API_URL = import.meta.env.DEV
     ? "http://localhost:3001"
     : "https://toolbox.anttituomola.fi";
 
   const fetchEssays = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/essays`, {
-        credentials: "include",
+      const response = await fetch(`${API_URL}/api/essays`, {
+        credentials: "include", // Needed for authentication
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch essays");
+        throw new Error(
+          `Failed to fetch essays: ${response.status} ${response.statusText}`
+        );
       }
 
       const data = await response.json();
+      console.log("Essay response data:", data);
       setEssays(data.items || []);
     } catch (error) {
       console.error("Error fetching essays:", error);
@@ -183,12 +186,14 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
 
   const fetchEssayDetails = async (id: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/essays/${id}`, {
-        credentials: "include",
+      const response = await fetch(`${API_URL}/api/essays/${id}`, {
+        credentials: "include", // Needed for authentication
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch essay details");
+        throw new Error(
+          `Failed to fetch essay details: ${response.status} ${response.statusText}`
+        );
       }
 
       const data = await response.json();
@@ -208,17 +213,23 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
     selectedVoiceId: string = voiceId
   ) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/essays/${id}/process`, {
+      // Get the JWT token from cookies for auth
+      const token = document.cookie.match(/token=([^;]+)/)?.[1] || "";
+
+      const response = await fetch(`${API_URL}/api/essays/${id}/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ voiceId: selectedVoiceId }),
         credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error("Failed to trigger processing");
+        throw new Error(
+          `Failed to trigger processing: ${response.status} ${response.statusText}`
+        );
       }
 
       setMessage("Audio processing started. This may take a minute...");
@@ -245,31 +256,36 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
     setMessage("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/essays`, {
+      const response = await fetch(`${API_URL}/api/essays`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title,
+          title: title || "Untitled Essay",
           content,
-          voiceId, // Include selected voice
+          voiceId: voiceId || "Matthew",
         }),
-        credentials: "include",
+        credentials: "include", // Needed for authentication
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to submit essay");
+        const errorData = await response.json().catch(() => null);
+        throw new Error(
+          `Failed to submit essay: ${response.status} ${response.statusText}${
+            errorData ? ` - ${JSON.stringify(errorData)}` : ""
+          }`
+        );
       }
 
       const data = await response.json();
+      console.log("Essay created:", data);
 
-      setMessage("Essay submitted successfully and audio processing started!");
+      setMessage("Essay submitted successfully!");
       setTitle("");
       setContent("");
 
-      // Fetch the newly created essay after a delay to allow for processing
+      // Give the backend a moment to process
       setTimeout(() => {
         fetchEssays();
         setView("list");
@@ -292,6 +308,11 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
       fetchEssays();
     }
   }, [view]);
+
+  // Initialize on component mount
+  useEffect(() => {
+    fetchEssays(); // Fetch essays when component mounts
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -475,36 +496,56 @@ const EssayReader: React.FC<EssayReaderProps> = () => {
                   <audio
                     controls
                     className="w-full"
-                    src={`${API_BASE_URL}${selectedEssay.audioUrl}`}
+                    src={`${API_URL}${selectedEssay.audioUrl}`}
                   />
+                </div>
+              ) : selectedEssay.status === "pending" ? (
+                <div className="mb-6">
+                  <div className="flex items-center mb-4">
+                    <span className="mr-2">Status: {selectedEssay.status}</span>
+                    <div className="flex gap-2 items-center">
+                      <button
+                        onClick={() =>
+                          triggerProcessing(selectedEssay.id, voiceId)
+                        }
+                        className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                        disabled={isSubmitting}
+                      >
+                        Generate Audio
+                      </button>
+                      <select
+                        value={voiceId}
+                        onChange={(e) => setVoiceId(e.target.value)}
+                        className="p-1 border rounded text-sm"
+                      >
+                        <optgroup label="Long-form Voices">
+                          {VOICE_OPTIONS.filter((v) => v.longForm).map(
+                            (voice) => (
+                              <option key={voice.id} value={voice.id}>
+                                {voice.name} ({voice.gender}, {voice.language})
+                                {voice.generative ? " - Generative" : ""}
+                              </option>
+                            )
+                          )}
+                        </optgroup>
+                        <optgroup label="Standard Voices">
+                          {VOICE_OPTIONS.filter((v) => !v.longForm).map(
+                            (voice) => (
+                              <option key={voice.id} value={voice.id}>
+                                {voice.name} ({voice.gender}, {voice.language})
+                                {voice.generative ? " - Generative" : ""}
+                              </option>
+                            )
+                          )}
+                        </optgroup>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="mb-6">
                   <div className="flex items-center mb-4">
                     <span className="mr-2">Status: {selectedEssay.status}</span>
-                    {selectedEssay.status === "pending" && (
-                      <div className="flex gap-2 items-center">
-                        <button
-                          onClick={() => triggerProcessing(selectedEssay.id)}
-                          className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
-                        >
-                          Generate Audio
-                        </button>
-                        <select
-                          value={voiceId}
-                          onChange={(e) => setVoiceId(e.target.value)}
-                          className="text-sm px-2 py-1 border border-gray-300 rounded"
-                        >
-                          {VOICE_OPTIONS.filter((voice) => voice.longForm).map(
-                            (voice) => (
-                              <option key={voice.id} value={voice.id}>
-                                {voice.name}
-                              </option>
-                            )
-                          )}
-                        </select>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}

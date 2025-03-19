@@ -12,7 +12,9 @@
   "dependencies": {
     "@aws-sdk/client-polly": "^3.758.0",
     "@aws-sdk/node-http-handler": "^3.370.0",
+    "@types/aws-sdk": "^0.0.42",
     "@types/node-fetch": "^2.6.12",
+    "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

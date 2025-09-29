@@ -90,8 +90,8 @@ export const events: TimelineEvent[] = [
   },
   {
     startDate: "08/2008",
-    title: "Moved to Ylinen",
-    description: "Short stay in Ylinen",
+    title: "Moved to Ylöjärvi",
+    description: "I went to Voinonmaan opisto, studying photography. I lasted almost half a year.",
     tag: "personal",
   },
   {
@@ -140,7 +140,7 @@ export const events: TimelineEvent[] = [
     startDate: "01/2010",
     endDate: "12/2011",
     title: "Restaurant Manager at Peak & Twin Peak",
-    description: "Restaurant manager at Peak and Twin Peak restaurants at Ruka fell in Kuusamo (Marita ja Hannu Kuusiniemi Oy)",
+    description: "Restaurant manager at Peak and Twin Peak restaurants at Ruka fell in Kuusamo.",
     tag: "work",
   },
   {
@@ -155,6 +155,10 @@ export const events: TimelineEvent[] = [
     title: "Founder of Restaurant Day",
     description: "Created and led the world's largest food carnival",
     tag: "work",
+    image: {
+      src: "/images/ravintolapaiva.png",
+      alt: "Restaurant Day food carnival event",
+    },
   },
   {
     startDate: "06/2012",
@@ -187,8 +191,12 @@ export const events: TimelineEvent[] = [
     startDate: "01/2014",
     endDate: "12/2016",
     title: "Manager at Restaurant Paven",
-    description: "Restaurant manager at Restaurant Paven in Espoo (Galonis Oy)",
+    description: "Restaurant manager at Restaurant Paven in Espoo.",
     tag: "work",
+    image: {
+      src: "/images/paven.jpg",
+      alt: "Working at Restaurant Paven",
+    },
   },
   {
     startDate: "02/2015",
@@ -233,6 +241,10 @@ export const events: TimelineEvent[] = [
     title: "Met My Future Wife",
     description: "Met my future wife for the first time at Taste of Helsinki festival on June 19th, where I was selling food with Sinne Helsinki and she was having way too much wine with her friend",
     tag: "personal",
+    image: {
+      src: "/images/taste-of-helsinki.jpg",
+      alt: "Sinne Helsinki booth at Taste of Helsinki festival",
+    },
   },
   {
     startDate: "08/2014",
@@ -274,6 +286,10 @@ export const events: TimelineEvent[] = [
     title: "Business Development Director",
     description: "Led business development at ResQ Club",
     tag: "work",
+    image: {
+      src: "/images/resq-club.jpg",
+      alt: "Working at ResQ Club office",
+    },
   },
   {
     startDate: "08/2018",
@@ -292,11 +308,25 @@ export const events: TimelineEvent[] = [
     tag: "random",
   },
   {
+    startDate: "08/2020",
+    title: "My Firstborn Arrives",
+    description: "My daughter Verna was born! We had such a hasty departure to the hospital that I left my hot tub running. While we were at the hospital, it overheated and caught fire. The fire department managed to save part of it. When I finally got out of the hospital, I had about 39,487 missed calls and messages.",
+    tag: "personal",
+    image: {
+      src: "/images/verna-is-born.jpg",
+      alt: "Father and newborn daughter Verna at the hospital",
+    },
+  },
+  {
     startDate: "01/2020",
     endDate: "03/2021",
     title: "Moved to Jollaksentie, Helsinki",
     description: "Moved to Jollaksen kartano, where I managed a ballroom and a summer restaurant.",
     tag: "personal",
+    image: {
+      src: "/images/jollaksen-kartano-koti.jpg",
+      alt: "Living space at Jollaksen kartano",
+    },
   },
   {
     startDate: "01/2020",
@@ -305,11 +335,15 @@ export const events: TimelineEvent[] = [
     description:
       "Jollaksen kartano - A ballroom in Helsinki hosting meetings, parties, and weddings",
     tag: "work",
+    image: {
+      src: "/images/jollaksen-kartano-venue.jpg",
+      alt: "Jollaksen kartano ballroom venue",
+    },
   },
   {
     startDate: "04/2021",
     title: "Moved to Tampere",
-    description: "Moved to Juhannuskylänkatu, Tampere - first time living outside Helsinki area",
+    description: "Moved to Juhannuskylä, Tampere. Loving it.",
     tag: "personal",
   },
   {

@@ -1,19 +1,180 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Button from "../components/Button.astro";
 ---
 
 <Layout title="Antti Tuomola - CV" activePage="cv">
-  <div
-    class="min-h-[60vh] flex flex-col items-center justify-center text-center px-4"
-  >
-    <h1 class="text-4xl font-bold text-text-primary mb-6">CV Coming Soon</h1>
-    <p class="text-xl text-text-secondary max-w-2xl">
-      I'm currently working on putting together a comprehensive CV. Check back
-      soon!
-    </p>
-    <div class="mt-12">
-      <Button href="/timeline"> Meanwhile, check out my timeline </Button>
+  <div class="max-w-4xl mx-auto">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-text-primary mb-4">Antti Tuomola</h1>
+      <p class="text-xl text-primary mb-4">Software Developer | HR Specialist | Business Development Leader</p>
+      <p class="text-text-secondary mb-6">Tampere, Finland</p>
+      
+      <!-- Contact Information -->
+      <div class="flex flex-wrap justify-center gap-4 text-sm text-text-secondary">
+        <a href="mailto:antti@anttituomola.fi" class="hover:text-primary-hover transition-colors">
+          antti@anttituomola.fi
+        </a>
+        <span>•</span>
+        <span>+358 45 679 8818</span>
+        <span>•</span>
+        <a href="https://linkedin.com/in/anttituomola" target="_blank" class="hover:text-primary-hover transition-colors">
+          LinkedIn
+        </a>
+        <span>•</span>
+        <a href="https://github.com/anttituomola" target="_blank" class="hover:text-primary-hover transition-colors">
+          GitHub
+        </a>
+      </div>
     </div>
+
+    <!-- Profile Section -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold text-text-primary mb-4 border-b border-border pb-2">Profile</h2>
+      <p class="text-text-secondary leading-relaxed">
+        Web developer and operations professional with 15+ years in technology, communications, and hospitality. 
+        Combines deep front-end engineering skills with experience in sales, marketing automation, and team leadership. 
+        Founder of global food-culture event <em>Restaurant Day</em>.
+      </p>
+    </section>
+
+    <!-- Core Skills Section -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold text-text-primary mb-4 border-b border-border pb-2">Core Skills</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="text-lg font-medium text-text-primary mb-2">Frontend & Full-Stack</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">
+            JavaScript, TypeScript, React, Next.js, Vite, Tailwind CSS, HTML5, CSS, Redux, PostgreSQL, Node.js, AWS basics, Azure basics.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium text-text-primary mb-2">Process & Delivery</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">
+            Agile/Scrum, project communication, team leadership, stakeholder management, workshop facilitation.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium text-text-primary mb-2">Business & Growth</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">
+            Business development, solution sales, marketing automation, recruitment, HR process design.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium text-text-primary mb-2">AI & Data</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">
+            Generative AI, AI training and consulting, SQL, analytics.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Experience Section -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold text-text-primary mb-4 border-b border-border pb-2">Key Experience</h2>
+      <div class="space-y-6">
+        
+        <!-- Gofore -->
+        <div class="border-l-2 border-primary pl-4">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+            <h3 class="text-lg font-medium text-text-primary">Gofore Oyj</h3>
+            <span class="text-text-muted text-sm">2022–present</span>
+          </div>
+          <p class="text-primary text-sm font-medium mb-2">Software Developer & HR Match Maker</p>
+          <ul class="text-text-secondary text-sm space-y-1 list-disc list-inside">
+            <li>Built Finland's Ministry of Finance budget-planning tool (React, TypeScript, PostgreSQL, Azure).</li>
+            <li>Designed internal staffing processes, coached teams, and optimized expert–client matching.</li>
+          </ul>
+        </div>
+
+        <!-- True Solutions -->
+        <div class="border-l-2 border-primary pl-4">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+            <h3 class="text-lg font-medium text-text-primary">True Solutions Oy</h3>
+            <span class="text-text-muted text-sm">2023–present</span>
+          </div>
+          <p class="text-primary text-sm font-medium mb-2">Founder & Full-Stack Developer</p>
+          <ul class="text-text-secondary text-sm space-y-1 list-disc list-inside">
+            <li>Created <em>tyovuorolista.fi</em> roster-planning SaaS for restaurants and SMEs using Next.js, Supabase, Stripe.</li>
+          </ul>
+        </div>
+
+        <!-- ResQ Club -->
+        <div class="border-l-2 border-primary pl-4">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+            <h3 class="text-lg font-medium text-text-primary">ResQ Club</h3>
+            <span class="text-text-muted text-sm">2018–2022</span>
+          </div>
+          <p class="text-primary text-sm font-medium mb-2">Business Development Director</p>
+          <ul class="text-text-secondary text-sm space-y-1 list-disc list-inside">
+            <li>Doubled GMV, led sales and marketing teams, built lifecycle communication automation reaching 1 M+ customers, performed SQL-based performance analytics.</li>
+          </ul>
+        </div>
+
+        <!-- Hospitality Ventures -->
+        <div class="border-l-2 border-primary pl-4">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+            <h3 class="text-lg font-medium text-text-primary">Hospitality Ventures</h3>
+            <span class="text-text-muted text-sm">2011–2021</span>
+          </div>
+          <p class="text-primary text-sm font-medium mb-2">Entrepreneur & Operations Lead</p>
+          <ul class="text-text-secondary text-sm space-y-1 list-disc list-inside">
+            <li>Founded and managed high-end restaurants, catering companies, and event venues; recruited and managed teams of tens.</li>
+          </ul>
+        </div>
+
+        <!-- Journalism & Media -->
+        <div class="border-l-2 border-primary pl-4">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+            <h3 class="text-lg font-medium text-text-primary">Journalism & Media</h3>
+            <span class="text-text-muted text-sm">2006–2018</span>
+          </div>
+          <p class="text-primary text-sm font-medium mb-2">Radio Host, Journalist, Photographer</p>
+          <ul class="text-text-secondary text-sm space-y-1 list-disc list-inside">
+            <li>Produced and hosted radio shows; wrote and photographed for national outlets.</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Selected Projects Section -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold text-text-primary mb-4 border-b border-border pb-2">Selected Projects</h2>
+      <ul class="text-text-secondary space-y-2 list-disc list-inside">
+        <li><strong class="text-text-primary">Gonnect Staffing / Match Maker</strong> – Matching best possible candidates to projects.</li>
+        <li><strong class="text-text-primary">State Budget Planning Tool</strong> – Full-stack rebuild for Finland's Ministry of Finance.</li>
+        <li><strong class="text-text-primary">Pesäpuu Ry AI Workshop</strong> – Designed and facilitated AI ethics and use-case training for a child-protection NGO.</li>
+        <li>Numerous web projects from marketing sites to SaaS platforms, e.g., <em>tampereensaunalautat.fi</em>.</li>
+      </ul>
+    </section>
+
+    <!-- Education & Certifications Section -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold text-text-primary mb-4 border-b border-border pb-2">Education & Certifications</h2>
+      <ul class="text-text-secondary space-y-2 list-disc list-inside">
+        <li>BA (Hons) Documentary Photography, University of Wales (incomplete)</li>
+        <li>Professional Scrum Master I (2022)</li>
+      </ul>
+    </section>
+
+    <!-- Awards & Achievements Section -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold text-text-primary mb-4 border-b border-border pb-2">Awards & Achievements</h2>
+      <ul class="text-text-secondary space-y-2 list-disc list-inside">
+        <li>Founder, <em>Restaurant Day</em> (global event in 100+ countries)</li>
+        <li>Helsinki Cultural Achievement Award (2011)</li>
+        <li>Finalist, Finland Best Recruiting Campaign (2020)</li>
+      </ul>
+    </section>
+
+    <!-- Languages Section -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold text-text-primary mb-4 border-b border-border pb-2">Languages</h2>
+      <p class="text-text-secondary">
+        Finnish (native), English (advanced), Swedish (basic)
+      </p>
+    </section>
+
   </div>
 </Layout>

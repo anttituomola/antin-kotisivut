@@ -1,20 +1,28 @@
 {
   "name": "antin-kotisivut",
+  "type": "module",
   "private": true,
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev": "npx serve . -s",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
     "toolbox:dev": "npm run dev --workspace=toolbox",
     "toolbox:build": "npm run build --workspace=toolbox",
     "toolbox:preview": "npm run preview --workspace=toolbox",
     "toolbox:api": "cd apps/toolbox/api && npm run dev",
     "toolbox:dev:all": "npx concurrently \"npm run toolbox:dev\" \"npm run toolbox:api\""
   },
+  "dependencies": {
+    "astro": "^4.15.12"
+  },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "@astrojs/check": "^0.9.3",
+    "typescript": "^5.6.2"
   },
   "overrides": {
     "path-to-regexp": "^8.2.0"

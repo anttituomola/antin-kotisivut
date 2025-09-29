@@ -1,30 +1,7 @@
 {
-  "buildCommand": "cd apps/website && npm install && npm run build",
-  "outputDirectory": "apps/website/dist",
-  "framework": "astro",
-  "installCommand": "echo 'Skipping root install'",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/apps/website/dist/$1" }
-  ],
-  "functions": {
-    "api/**/*.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  },
-  "routes": [
-    { "src": "/api/essays", "dest": "/api/essays.js" },
-    { "src": "/api/essays/([^/]+)$", "dest": "/api/essays/[id].js?id=$1" },
-    { "src": "/api/essays/([^/]+)/process", "dest": "/api/essays/[id]/process.js?id=$1" },
-    { "src": "/api/essays/([^/]+)/audio", "dest": "/api/essays/[id]/audio.js?id=$1" }
-  ],
   "git": {
     "deploymentEnabled": {
       "main": true
     }
-  },
-  "env": {
-    "POCKETBASE_URL": "https://api.anttituomola.fi",
-    "NODE_ENV": "production"
   }
 } 

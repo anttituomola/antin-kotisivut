@@ -17,5 +17,8 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "overrides": {
+    "path-to-regexp": "^8.2.0"
   }
 }

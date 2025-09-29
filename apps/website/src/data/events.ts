@@ -214,6 +214,10 @@ export const events: TimelineEvent[] = [
     title: "Olo Restaurant",
     description: "Worked at Olo Restaurant, a Michelin star restaurant in Helsinki",
     tag: "work",
+    image: {
+      src: "/images/restaurant-olo.jpg",
+      alt: "Working in the kitchen at Olo Restaurant",
+    },
   },
   {
     startDate: "01/2015",
@@ -310,11 +314,11 @@ export const events: TimelineEvent[] = [
   {
     startDate: "08/2020",
     title: "My Firstborn Arrives",
-    description: "My daughter Verna was born! We had such a hasty departure to the hospital that I left my hot tub running. While we were at the hospital, it overheated and caught fire. The fire department managed to save part of it. When I finally got out of the hospital, I had about 39,487 missed calls and messages.",
+    description: "My daughter was born! We had such a hasty departure to the hospital that I left my hot tub running. While we were at the hospital, it overheated and caught fire. The fire department managed to save part of it. When I finally got out of the hospital, I had about 39,487 missed calls and messages.",
     tag: "personal",
     image: {
       src: "/images/verna-is-born.jpg",
-      alt: "Father and newborn daughter Verna at the hospital",
+      alt: "Father and newborn daughter at the hospital",
     },
   },
   {

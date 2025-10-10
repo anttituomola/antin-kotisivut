@@ -1,0 +1,231 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+interface PressItem {
+  id: string;
+  title: string;
+  publication: string;
+  date: string;
+  image: string;
+  url?: string;
+}
+
+const pressItems: PressItem[] = [
+  {
+    id: "yle-suomi-palkinto",
+    title: "Rakkaus ruokakulttuuriin toi Suomi-palkinnon",
+    publication: "Yle",
+    date: "2011-12-15",
+    image: "/images/press/yle-suomi-palkinto.png",
+    url: "https://yle.fi/a/3-5468632"
+  },
+  {
+    id: "yle-suomen-evaat",
+    title: "Suomen eväät",
+    publication: "Yle",
+    date: "2017-12-31",
+    image: "/images/press/Suomen eväät Suomen eväät Yle Areena(1)-min.png",
+    url: "https://areena.yle.fi/1-4315415"
+  },
+  {
+    id: "hs-ravintolapaiva-kasvisravintola",
+    title: "Ravintolapäivän perustaja avaa kasvisravintolan viikoksi Töölönlahdelle",
+    publication: "Helsingin Sanomat",
+    date: "2016-01-11",
+    image: "/images/press/hs-ravintolapaiva-kasvisravintola.png",
+    url: "https://www.hs.fi/nyt/art-2000002879236.html"
+  },
+  {
+    id: "yle-karjula-tuomola",
+    title: "Karjula & Tuomola - Kurkunleikkaajat",
+    publication: "Yle",
+    date: "2016-08-03",
+    image: "/images/press/Suomalaisen ruokakulttuurin nousu, tuho ja uudelleensyntyminen Karjula Tuomola - Kurkunleikkaajat Yle Areena-min.png",
+    url: "https://areena.yle.fi/1-3496867"
+  },
+  {
+    id: "hs-kartano-vuokra",
+    title: "Poikkeuksellinen tarjous Helsingissä: Tuhannella eurolla kuussa pääsee asumaan kartanoon",
+    publication: "Helsingin Sanomat",
+    date: "2020-01-18",
+    image: "/images/press/hs-kartano-vuokra-tarjous.png",
+    url: "https://www.hs.fi/helsinki/art-2000006376355.html"
+  },
+  {
+    id: "hs-rastila-ravintola",
+    title: "Kiitetty saaristoravintola muuttaa Rastilaan – nyt illallista tarjotaan Lähiössä",
+    publication: "Helsingin Sanomat",
+    date: "2014-04-01",
+    image: "/images/press/hs-rastila-ravintola.png",
+    url: "https://www.hs.fi/nyt/art-2000002720958.html"
+  },
+  {
+    id: "hs-villa-villingenas",
+    title: "Viehko Villa Villingenäs on toisesta maailmasta",
+    publication: "Helsingin Sanomat",
+    date: "2013-07-19",
+    image: "/images/press/villa-villingenas-hs-fi-arvostelu.jpg",
+    url: "" // Article no longer available online
+  },
+  {
+    id: "hs-koodari-ala",
+    title: "Sadat koodarit eivät saa töitä. Samaan aikaan puhutaan koodaripulasta",
+    publication: "Helsingin Sanomat",
+    date: "2022-05-05",
+    image: "/images/press/hs-koodari-ala.png",
+    url: "https://www.hs.fi/visio/art-2000008787966.html"
+  },
+  {
+    id: "talouselama-youtube-koodari",
+    title: "Antti opiskeli Youtubessa ja sai oman alan töitä – Palkka jopa yli 5 000€/kk",
+    publication: "Talouselämä",
+    date: "2023-02-14",
+    image: "/images/press/talouselama-youtube-koodari.png",
+    url: "https://www.talouselama.fi/uutiset/a/dc91a9cd-2224-4f00-ab57-f82c79097f90"
+  },
+  {
+    id: "yle-jollaksen-kartano",
+    title: "Suositun Jollaksen kartanon yrittäjä lopettaa",
+    publication: "Yle",
+    date: "2021-04-09",
+    image: "/images/press/yle-jollaksen-kartano.png",
+    url: "https://yle.fi/a/3-11877370"
+  },
+  {
+    id: "paikalliset-kivitalo-vuokra",
+    title: "Antti vuokrasi 400-neliöisen kivitalon meri-idyllistä",
+    publication: "Helsingin Uutiset",
+    date: "2020-08-28",
+    image: "/images/press/paikalliset-kivitalo-vuokra.png",
+    url: "https://www.helsinginuutiset.fi/paikalliset/2792967"
+  }
+];
+
+// Sort by date (newest first)
+const sortedPressItems = pressItems.sort((a, b) => 
+  new Date(b.date).getTime() - new Date(a.date).getTime()
+);
+---
+
+<Layout title="Press - Antti Tuomola" activePage="press">
+  <section class="max-w-6xl mx-auto">
+    <div class="mb-12">
+      <h1 class="text-4xl font-bold text-text-primary mb-4">Press</h1>
+      <p class="text-xl text-text-secondary">
+        Media coverage and press mentions
+      </p>
+    </div>
+
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {
+        sortedPressItems.map((item) => (
+          <article class="bg-surface rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+            <div class="aspect-[4/3] overflow-hidden relative group">
+              {item.url ? (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block w-full h-full"
+                  title={`Read: ${item.title}`}
+                >
+                  <img
+                    src={item.image}
+                    alt={`${item.title} - ${item.publication}`}
+                    class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <!-- External link icon -->
+                  <div class="absolute top-2 right-2 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </div>
+                </a>
+              ) : (
+                <a
+                  href={item.image}
+                  target="_blank"
+                  class="block w-full h-full"
+                  title={`View image: ${item.title}`}
+                >
+                  <img
+                    src={item.image}
+                    alt={`${item.title} - ${item.publication}`}
+                    class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <!-- Expand/zoom icon -->
+                  <div class="absolute top-2 right-2 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                    </svg>
+                  </div>
+                </a>
+              )}
+            </div>
+            <div class="p-6">
+              <div class="flex items-center justify-between text-sm text-text-muted mb-3">
+                <span class="font-medium text-primary">{item.publication}</span>
+                <time datetime={item.date}>
+                  {new Date(item.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary mb-3 line-clamp-3">
+                {item.title}
+              </h3>
+              {item.url && (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center text-primary hover:text-primary-hover transition-colors font-medium"
+                >
+                  Read article
+                  <svg
+                    class="w-4 h-4 ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              )}
+              {!item.url && item.id === "hs-villa-villingenas" && (
+                <span class="text-text-muted italic">Article no longer available online</span>
+              )}
+              {!item.url && item.id !== "hs-villa-villingenas" && (
+                <span class="text-text-muted italic">Link coming soon</span>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="mt-12 text-center">
+      <p class="text-text-secondary">
+        For media inquiries, please <a href="/contact" class="text-primary hover:text-primary-hover transition-colors">get in touch</a>.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

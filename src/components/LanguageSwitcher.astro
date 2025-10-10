@@ -1,0 +1,49 @@
+---
+interface Props {
+  currentLanguage: string;
+  translationUrl?: string;
+  minimal?: boolean;
+}
+
+const { currentLanguage, translationUrl, minimal = false } = Astro.props;
+---
+
+{
+  translationUrl &&
+    (minimal ? (
+      <div class="flex gap-2">
+        <a
+          href={currentLanguage === "fi" ? translationUrl : "#"}
+          class={
+            currentLanguage === "en"
+              ? "font-bold"
+              : "opacity-50 hover:opacity-100"
+          }
+        >
+          🇬🇧
+        </a>
+        <a
+          href={currentLanguage === "en" ? translationUrl : "#"}
+          class={
+            currentLanguage === "fi"
+              ? "font-bold"
+              : "opacity-50 hover:opacity-100"
+          }
+        >
+          🇫🇮
+        </a>
+      </div>
+    ) : (
+      <div class="my-4">
+        <a
+          href={translationUrl}
+          class="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-full hover:bg-accent/80 transition-colors"
+        >
+          {currentLanguage === "fi"
+            ? "Read this post in English 🇬🇧"
+            : "Lue tämä teksti suomeksi 🇫🇮"}
+        </a>
+      </div>
+    ))
+}
+

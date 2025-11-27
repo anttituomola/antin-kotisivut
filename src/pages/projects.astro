@@ -1,0 +1,94 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const projects = [
+  {
+    title: "Tampereen Saunalautat",
+    url: "https://www.tampereensaunalautat.fi/",
+    description: "A comprehensive platform for browsing and booking sauna rafts in Tampere. The site aggregates all available sauna raft rentals on Tampere's lakes (Näsijärvi and Pyhäjärvi), making it easy to compare options, prices, and features. Users can filter by availability and add rafts to quote requests.",
+    tags: ["Next.js", "TypeScript", "Express", "SQLite"],
+  },
+  {
+    title: "Työvuorolista.fi",
+    url: "https://www.tyovuorolista.fi/",
+    description: "A SaaS platform for small and medium-sized businesses to manage employee shift schedules quickly and easily. Features drag-and-drop shift creation, automatic email notifications, salary reports, resource scheduling, and mobile optimization. Trusted by restaurants and service businesses across Finland.",
+    tags: ["Next.js", "Supabase", "Stripe", "SaaS"],
+  },
+  {
+    title: "Mitä Tänään Liputetaan?",
+    url: "https://mitatanaanliputetaan.vercel.app/",
+    description: "A simple and elegant website that tells you whether it's an official flag day in Finland today. Shows all Finnish flag flying days, the previous flag day, and the next upcoming one. Includes a public API for developers to integrate flag day information into their applications.",
+    tags: ["Next.js", "TypeScript", "Public API"],
+  },
+  {
+    title: "Tampereen Kaupunginosat",
+    url: "https://www.tampereenkaupunginosat.fi/",
+    description: "An interactive learning tool for mastering Tampere's district names and locations. Features three game modes: Quiz (choose the correct district), Browse (hover to see names), and Search (click the right district). Built with open data from the city of Tampere and Maanmittauslaitos.",
+    tags: ["React", "TypeScript", "Vite", "Open Data"],
+  },
+  {
+    title: "FeastBid",
+    url: "https://www.feastbid.com/",
+    description: "A comprehensive platform for catering professionals to modernize their business operations. Create stylish quotes in minutes, manage product catalogs with seasonal availability and pricing tiers, and automatically generate professional contract terms. Streamlines workflow from catalog management to winning more clients.",
+    tags: ["React", "TypeScript", "PocketBase", "Vite"],
+  },
+];
+---
+
+<Layout title="Projects - Antti Tuomola" activePage="projects">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header Section -->
+    <div class="mb-12">
+      <h1 class="text-4xl font-bold text-text-primary mb-4">Projects</h1>
+      <p class="text-lg text-text-secondary">
+        A selection of web applications and platforms I've built. Click any card to visit the live site.
+      </p>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="grid md:grid-cols-2 gap-6">
+      {
+        projects.map((project) => (
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group block bg-card border border-border rounded-lg p-6 hover:border-primary transition-all duration-300 hover:shadow-lg"
+          >
+            <div class="flex flex-col h-full">
+              <h2 class="text-xl font-semibold text-text-primary mb-3 group-hover:text-primary transition-colors">
+                {project.title}
+                <svg
+                  class="inline-block w-4 h-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+              </h2>
+              
+              <p class="text-text-secondary text-sm mb-4 flex-grow leading-relaxed">
+                {project.description}
+              </p>
+              
+              <div class="flex flex-wrap gap-2">
+                {project.tags.map((tag) => (
+                  <span class="text-xs px-2 py-1 bg-primary/10 text-primary rounded">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</Layout>
+

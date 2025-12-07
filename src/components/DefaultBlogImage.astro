@@ -1,0 +1,63 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+}
+
+const { title, subtitle } = Astro.props;
+
+// Generate a deterministic color based on the title
+// This ensures the same post always gets the same color
+function getColorFromTitle(title: string): string {
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) {
+    hash = title.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  // Use accent colors with variations
+  const accentColors = [
+    '#2E3B30', // accent DEFAULT
+    '#394739', // accent hover
+    '#4A3F35', // primary dark
+    '#4B7154', // status success
+    '#2E3B30', // accent DEFAULT (repeat for more options)
+  ];
+  
+  return accentColors[Math.abs(hash) % accentColors.length];
+}
+
+const backgroundColor = getColorFromTitle(title);
+---
+
+<div
+  class="default-blog-image w-full h-48 md:h-full flex flex-col justify-center p-6 relative overflow-hidden"
+  style={`background-color: ${backgroundColor};`}
+>
+  <!-- Gradient overlay for depth -->
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 pointer-events-none"></div>
+  
+  <!-- Content -->
+  <div class="relative z-10">
+    <h2 class="text-xl font-bold text-text-primary mb-3 line-clamp-2 leading-tight">
+      {title}
+    </h2>
+    {subtitle && (
+      <p class="text-sm text-text-secondary line-clamp-2 leading-snug">
+        {subtitle}
+      </p>
+    )}
+  </div>
+</div>
+
+<style>
+  .default-blog-image {
+    min-height: 192px;
+  }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
+

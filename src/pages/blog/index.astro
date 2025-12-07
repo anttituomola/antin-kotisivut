@@ -57,16 +57,16 @@ const sortedPosts = Object.values(groupedPosts)
                     </h2>
                   </div>
                   <p class="text-text-secondary mb-4">{post.data.excerpt}</p>
-                  <div class="flex justify-between items-center">
+                  <div class="flex justify-between items-center gap-4">
                     <time
                       datetime={post.data.pubDate.toISOString()}
                       class="text-text-muted"
                     >
                       {new Date(post.data.pubDate).toLocaleDateString()}
                     </time>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2 justify-end">
                       {post.data.tags.map((tag) => (
-                        <span class="bg-accent bg-opacity-20 text-text-primary px-3 py-1 rounded-full text-sm">
+                        <span class="text-xs px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md">
                           {tag}
                         </span>
                       ))}

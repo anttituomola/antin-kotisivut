@@ -14,7 +14,7 @@ const groupedPosts: Record<string, typeof posts> = posts.reduce((acc, post) => {
   if (!acc[dateKey]) acc[dateKey] = [];
   acc[dateKey].push(post);
   return acc;
-}, {});
+}, {} as Record<string, typeof posts>);
 
 // For each group, prefer English version if available, otherwise use Finnish
 const sortedPosts = Object.values(groupedPosts)
@@ -36,12 +36,12 @@ const sortedPosts = Object.values(groupedPosts)
           <article class="bg-surface rounded-lg shadow-md hover:ring-1 hover:ring-accent transition-all overflow-hidden">
             <a href={`/blog/${post.slug}`} class="block">
               <div class="md:flex">
-                <div class="md:w-72 shrink-0">
+                <div class="md:w-72 md:h-[230.4px] shrink-0">
                   {post.data.image ? (
                     <img
                       src={post.data.image}
                       alt={post.data.title}
-                      class="w-full h-48 md:h-full object-cover"
+                      class="w-full h-48 md:h-[230.4px] object-cover object-center"
                     />
                   ) : (
                     <DefaultBlogImage

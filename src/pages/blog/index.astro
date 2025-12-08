@@ -62,7 +62,7 @@ const sortedPosts = Object.values(groupedPosts)
                       datetime={post.data.pubDate.toISOString()}
                       class="text-text-muted"
                     >
-                      {new Date(post.data.pubDate).toLocaleDateString()}
+                      {new Date(post.data.pubDate).toLocaleDateString('en-GB')}
                     </time>
                     <div class="flex flex-wrap gap-2 justify-end">
                       {post.data.tags.map((tag) => (

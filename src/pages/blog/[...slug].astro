@@ -67,7 +67,7 @@ try {
     </h1>
     <div class="flex gap-4 text-text-secondary mb-8">
       <time datetime={post.data.pubDate.toISOString()}>
-        {new Date(post.data.pubDate).toLocaleDateString()}
+        {new Date(post.data.pubDate).toLocaleDateString('en-GB')}
       </time>
       <span>·</span>
       <span>{post.data.author}</span>

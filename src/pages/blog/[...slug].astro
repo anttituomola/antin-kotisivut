@@ -53,9 +53,20 @@ try {
   console.error("Error rendering post:", error);
   return Astro.redirect("/blog");
 }
+
 ---
 
-<Layout title={post.data.title} activePage="blog">
+<Layout 
+  title={post.data.title} 
+  description={post.data.excerpt}
+  activePage="blog"
+  image={post.data.image}
+  imageAlt={post.data.title}
+  type="article"
+  publishedTime={post.data.pubDate}
+  author={post.data.author}
+  tags={post.data.tags}
+>
   <article class="max-w-prose mx-auto">
     <LanguageSwitcher
       currentLanguage={post.data.language}

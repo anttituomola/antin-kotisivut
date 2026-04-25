@@ -1,5 +1,5 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import LanguageSwitcher from "../../components/LanguageSwitcher";
 
@@ -10,18 +10,20 @@ export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => {
     return import.meta.env.PROD ? !data.draft : true;
   });
+  const getSlug = (post: (typeof posts)[number]) =>
+    post.id.replace(/\.(md|mdx)$/, "");
 
   // Log all available posts and their slugs
   console.log(
     "Available posts:",
     posts.map((p) => ({
-      slug: p.slug,
+      slug: getSlug(p),
       title: p.data.title,
     }))
   );
 
   const paths = posts.map((post) => ({
-    params: { slug: post.slug },
+    params: { slug: getSlug(post) },
     props: { post },
   }));
 
@@ -37,7 +39,7 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-console.log("Current post:", post?.slug);
+console.log("Current post:", post?.id.replace(/\.(md|mdx)$/, ""));
 
 // Ensure post exists before rendering
 if (!post) {
@@ -47,7 +49,7 @@ if (!post) {
 
 let Content;
 try {
-  const rendered = await post.render();
+  const rendered = await render(post);
   Content = rendered.Content;
 } catch (error) {
   console.error("Error rendering post:", error);

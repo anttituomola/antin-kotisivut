@@ -7,10 +7,14 @@ const posts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? !data.draft : true;
 });
 
+const getPostSlug = (post: (typeof posts)[number]) =>
+  post.id.replace(/\.(md|mdx)$/, "");
+
 // Group posts by their date (ignoring the title part)
 const groupedPosts: Record<string, typeof posts> = posts.reduce((acc, post) => {
   // Extract just the date part: "2025-01-11"
-  const dateKey = post.slug.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? post.slug;
+  const slug = getPostSlug(post);
+  const dateKey = slug.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? slug;
   if (!acc[dateKey]) acc[dateKey] = [];
   acc[dateKey].push(post);
   return acc;
@@ -34,7 +38,7 @@ const sortedPosts = Object.values(groupedPosts)
       {
         sortedPosts.map((post) => (
           <article class="bg-surface rounded-lg shadow-md hover:ring-1 hover:ring-accent transition-all overflow-hidden">
-            <a href={`/blog/${post.slug}`} class="block">
+            <a href={`/blog/${getPostSlug(post)}`} class="block">
               <div class="md:flex">
                 <div class="md:w-72 md:h-[230.4px] shrink-0">
                   {post.data.image ? (

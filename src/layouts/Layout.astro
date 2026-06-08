@@ -26,10 +26,14 @@ const {
   tags,
 } = Astro.props;
 
-// Construct absolute URL for the site
-const siteUrl = import.meta.env.SITE || `${Astro.url.origin}`;
-const pageUrl = Astro.url.href;
-const imageUrl = image ? (image.startsWith('http') ? image : `${siteUrl}${image}`) : undefined;
+// Construct absolute URLs for social previews (must be publicly reachable, not localhost)
+const siteUrl = import.meta.env.SITE || Astro.url.origin;
+const pageUrl = new URL(Astro.url.pathname, siteUrl).href;
+const imageUrl = image
+  ? image.startsWith("http")
+    ? image
+    : new URL(image, siteUrl).href
+  : undefined;
 ---
 
 <!doctype html>
@@ -47,6 +51,7 @@ const imageUrl = image ? (image.startsWith('http') ? image : `${siteUrl}${image}
     <meta property="og:url" content={pageUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Antti Tuomola" />
     {imageUrl && <meta property="og:image" content={imageUrl} />}
     {imageAlt && <meta property="og:image:alt" content={imageAlt} />}
     {type === "article" && publishedTime && (

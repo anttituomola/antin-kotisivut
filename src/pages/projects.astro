@@ -28,9 +28,9 @@ const projects = [
   },
   {
     title: "FeastBid",
-    url: "https://www.feastbid.com/",
     description: "A comprehensive platform for catering professionals to modernize their business operations. Create stylish quotes in minutes, manage product catalogs with seasonal availability and pricing tiers, and automatically generate professional contract terms. Streamlines workflow from catalog management to winning more clients.",
     tags: ["React", "TypeScript", "PocketBase", "Vite"],
+    inactive: true,
   },
 ];
 ---
@@ -48,35 +48,46 @@ const projects = [
     <!-- Projects Grid -->
     <div class="grid md:grid-cols-2 gap-6">
       {
-        projects.map((project) => (
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group block bg-card border border-border rounded-lg p-6 hover:border-primary transition-all duration-300 hover:shadow-lg"
-          >
+        projects.map((project) => {
+          const cardClass = project.inactive
+            ? "block bg-card border border-border rounded-lg p-6 opacity-75"
+            : "group block bg-card border border-border rounded-lg p-6 hover:border-primary transition-all duration-300 hover:shadow-lg";
+
+          const content = (
             <div class="flex flex-col h-full">
-              <h2 class="text-xl font-semibold text-text-primary mb-3 group-hover:text-primary transition-colors">
-                {project.title}
-                <svg
-                  class="inline-block w-4 h-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </h2>
-              
+              <div class="flex items-start justify-between gap-3 mb-3">
+                <h2 class:list={[
+                  "text-xl font-semibold text-text-primary",
+                  !project.inactive && "group-hover:text-primary transition-colors",
+                ]}>
+                  {project.title}
+                  {!project.inactive && (
+                    <svg
+                      class="inline-block w-4 h-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  )}
+                </h2>
+                {project.inactive && (
+                  <span class="shrink-0 text-xs px-2 py-1 bg-text-secondary/10 text-text-secondary rounded">
+                    Inactive
+                  </span>
+                )}
+              </div>
+
               <p class="text-text-secondary text-sm mb-4 flex-grow leading-relaxed">
                 {project.description}
               </p>
-              
+
               <div class="flex flex-wrap gap-2">
                 {project.tags.map((tag) => (
                   <span class="text-xs px-2 py-1 bg-primary/10 text-primary rounded">
@@ -85,8 +96,21 @@ const projects = [
                 ))}
               </div>
             </div>
-          </a>
-        ))
+          );
+
+          return project.inactive ? (
+            <div class={cardClass}>{content}</div>
+          ) : (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={cardClass}
+            >
+              {content}
+            </a>
+          );
+        })
       }
     </div>
   </div>

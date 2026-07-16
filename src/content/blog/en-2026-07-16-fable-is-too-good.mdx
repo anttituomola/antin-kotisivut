@@ -1,0 +1,98 @@
+---
+title: "Fable Is Too Good"
+pubDate: 2026-07-16
+image: "/images/blog_post_images/fable_on_liian_hyva.jpg"
+excerpt: "For the first time it feels like AI is taking our jobs. Fable is so good I'd rather pay for its tokens than hire a junior."
+author: "Antti Tuomola"
+tags: ["AI", "Anthropic", "Fable", "software development", "work"]
+language: "en"
+translationUrl: "/blog/fi-2026-07-16-fable-on-liian-hyva"
+draft: false
+---
+
+<aside class="not-prose my-8 rounded-xl border border-primary/30 bg-primary/10 p-5 text-text-primary">
+  <p class="mb-2 text-sm font-semibold uppercase tracking-wide text-primary">TL;DR</p>
+  <p class="m-0 text-lg font-medium">Fable found years of technical debt, bugs, and even a double-billing bug in my side project — and fixed a big chunk of it in half an hour. If I could hire a junior for €3,000 a month, I'd put the money into Fable tokens instead.</p>
+</aside>
+
+<figure class="not-prose my-8">
+  <img
+    src="/images/blog_post_images/fable_on_liian_hyva.jpg"
+    alt="Photo: NASA / Dryden Flight Research Center, public domain. NACA's 'human computers' room in 1949 — people whose job was to be the computer."
+    class="w-full rounded-lg"
+  />
+  <figcaption class="mt-2 text-sm text-text-secondary text-center">
+    Photo: NASA / Dryden Flight Research Center, public domain. NACA's "human computers" room in 1949 — people whose job was to be the computer.
+  </figcaption>
+</figure>
+
+This week, for the first time, I got the feeling that AI is taking our jobs.
+
+Before I explain why, a brief look at Anthropic's recent history:
+
+- On April 7, 2026, Anthropic announced the Mythos model, considered so capable at finding and exploiting security vulnerabilities that it wasn't released to the general public. Instead, it was given to selected partners for defensive use.
+- On June 9, Anthropic released a more tightly constrained Fable version of the same base model for general use.
+- On June 12, the US Department of Commerce banned non-US nationals from using the models. Because Anthropic couldn't reliably restrict access by nationality, it pulled Fable entirely.
+- On June 30 the restriction was lifted, and Fable returned on July 1.
+- Long-term, Fable was meant to be used mainly on a consumption basis, paying list price per token. Anthropic nonetheless offered it temporarily to monthly subscribers.
+- The trial started on June 9, was interrupted on June 12, returned on July 1, and initially ended on July 7. It was then extended first to July 12 and again to July 19. At the same time, Claude Code's weekly usage limits were increased by 50 percent.
+
+All of this led, in my view, to a somewhat unhealthy relationship. Users of the model lived constantly one cough away from it no longer being available, no longer included in the monthly subscription, or no longer subsidized.
+
+Normally I wouldn't have cared. If a company screws around with product availability, I buy from someone else.
+
+But here's the big but.
+
+Fable is too good.
+
+## Architecture review
+
+Through work I have a fairly expensive Claude subscription, which I mostly use for paper-pushing: reviewing proposals, proofreading Excels, and the like.
+
+I took a week off and noticed that Anthropic had just extended the Fable trial. Because my usage quota resets weekly, the company pays for the capacity either way and unused capacity goes to waste. A perfect chance to try the model I'd been ignoring because of the whole availability circus.
+
+I gave Fable access to the source code of my side-hustle project [tyovuorolista.fi](https://tyovuorolista.fi) and told it I'd been building it for several years: at first with rather modest skill, later with better skill, but also with growing requirements. I asked it to find bugs, security risks, architectural problems, dead code, and so on.
+
+The model worked for about half an hour and produced a shame tree you wouldn't want to nail yourself to:
+
+- several security risks
+- clear customer-facing bugs, some of which had been in production for years
+- inconsistent features
+- technical and architectural debt
+- broken and incomplete tests
+- poor database design
+- plenty more
+
+I had known the system had technical debt and weak solutions. I hadn't understood how broadly and in how much detail the model would be able to find them.
+
+I started fixing the problems with cheaper models, because Fable is hellishly expensive and eats tokens. After I'd burned through my Cursor subscription tokens fixing the first few items, I noticed the company's Claude capacity was still left.
+
+I put Fable to work fixing its own findings.
+
+About half an hour later, the biggest problems were fixed. The model had rebuilt the testing infrastructure, written a huge number of tests, removed dead code and unnecessary dependencies, and made security fixes.
+
+Along the way it noticed from Stripe payment data that, due to an old bug, I had been double-billing one customer for months. I refunded the money, so this code review immediately paid for itself by hundreds of euros.
+
+All of that used only about half of my weekly Fable quota.
+
+## Drug dealer methods
+
+This is of course twisted and unhealthy. I'm being hooked on one of the market's most expensive language models with heavily subsidized time-limited access, after which comes list price.
+
+Still, I'm not at all sure I'll be annoyed enough to refuse to pay.
+
+The temptation to use Fable is absurdly strong.
+
+## Is it taking our jobs?
+
+When a language model is this good, you have to ask: is it taking our jobs?
+
+I still believe history repeats itself. When something gets drastically cheaper, its use increases. Increased use creates new activity, new products, and new needs around it.
+
+More software gets built, faster, for ever more purposes. In the end we do even more work at a much greater speed, and the Earth keeps going around in bottomless space.
+
+But does it take someone's job?
+
+Let's put it this way: if I could hire a technical person for my side-hustle company for €3,000 a month, I would put the money into Fable tokens without a second thought.
+
+For three grand, it would go to the moon and back.

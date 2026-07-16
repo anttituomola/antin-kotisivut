@@ -1,0 +1,98 @@
+---
+title: "Fable on liian hyvä"
+pubDate: 2026-07-16
+image: "/images/blog_post_images/fable_on_liian_hyva.jpg"
+excerpt: "Ensimmäistä kertaa tuntuu siltä, että tekoäly vie meidän työt. Fable on niin hyvä, että mieluummin maksaisin sen tokeneista kuin palkkaisin juniorin."
+author: "Antti Tuomola"
+tags: ["tekoäly", "AI", "Anthropic", "Fable", "ohjelmistokehitys", "työ"]
+language: "fi"
+translationUrl: "/blog/en-2026-07-16-fable-is-too-good"
+draft: false
+---
+
+<aside class="not-prose my-8 rounded-xl border border-primary/30 bg-primary/10 p-5 text-text-primary">
+  <p class="mb-2 text-sm font-semibold uppercase tracking-wide text-primary">TL;DR</p>
+  <p class="m-0 text-lg font-medium">Fable löysi sivuprojektistani vuosien teknisen velan, bugit ja jopa tuplalaskutuksen — ja korjasi ison osan siitä puolessa tunnissa. Jos voisin palkata juniorin 3&nbsp;000 eurolla kuukaudessa, laittaisin rahat mieluummin Fablen tokeneihin.</p>
+</aside>
+
+<figure class="not-prose my-8">
+  <img
+    src="/images/blog_post_images/fable_on_liian_hyva.jpg"
+    alt="Kuva: NASA / Dryden Flight Research Center, public domain. NACA:n 'human computers' -huone vuonna 1949 — ihmiset, joiden työ oli olla tietokone."
+    class="w-full rounded-lg"
+  />
+  <figcaption class="mt-2 text-sm text-text-secondary text-center">
+    Kuva: NASA / Dryden Flight Research Center, public domain. NACA:n "human computers" -huone vuonna 1949 — ihmiset, joiden työ oli olla tietokone.
+  </figcaption>
+</figure>
+
+Tällä viikolla minulle tuli ensimmäistä kertaa sellainen olo, että tekoäly vie meidän työt.
+
+Ennen kuin kerron miksi, lyhyt katsaus Anthropicin lähihistoriaan:
+
+- 7. huhtikuuta 2026 Anthropic julkisti Mythos-mallin, jota pidettiin niin tehokkaana tietoturvahaavoittuvuuksien etsimisessä ja hyödyntämisessä, ettei sitä julkaistu suurelle yleisölle. Sen sijaan se annettiin valittujen kumppaneiden käyttöön puolustustarkoituksiin.
+- 9. kesäkuuta Anthropic julkaisi samasta pohjamallista tiukemmin rajoitetun Fable-version yleiseen käyttöön.
+- 12. kesäkuuta Yhdysvaltain kauppaministeriö kielsi mallien käytön ei-yhdysvaltalaisilta. Koska Anthropic ei pystynyt luotettavasti rajaamaan käyttöä kansalaisuuden perusteella, se poisti Fable-mallin kokonaan saatavilta.
+- 30. kesäkuuta rajoitus poistettiin, ja Fable palasi käyttöön 1. heinäkuuta.
+- Fable oli tarkoitettu pitkällä aikavälillä käytettäväksi lähinnä kulutusperusteisesti, maksamalla jokaisesta tokenista listahinta. Anthropic tarjosi sitä kuitenkin kuukausitilaajille määräaikaisesti.
+- Kokeilujakso alkoi 9. kesäkuuta, katkesi 12. kesäkuuta, palasi 1. heinäkuuta ja päättyi aluksi 7. heinäkuuta. Sen jälkeen sitä jatkettiin ensin 12. heinäkuuta ja vielä 19. heinäkuuta asti. Samalla Claude Coden viikoittaisia käyttörajoja kasvatettiin 50 prosentilla.
+
+Kaikki tämä johti mielestäni hieman epäterveeseen suhteeseen. Mallin käyttäjät elivät koko ajan yskäisyn päässä siitä, ettei malli ollut enää saatavilla, kuulunut kuukausitilaukseen tai ollut hinnaltaan tuettu.
+
+Normaalisti tällä ei olisi ollut minulle mitään väliä. Jos firma perseilee tuotteensa saatavuuden kanssa, ostan joltain muulta.
+
+Mutta tässä on iso mutta.
+
+Fable on liian hyvä.
+
+## Arkkitehtuuriarvio
+
+Minulla on työni puolesta varsin hintava Claude-tilaus, jota käytän lähinnä paperinpyöritykseen: tarjousten tarkastamiseen, Excelien oikolukuun ja sen sellaiseen.
+
+Jäin viikoksi lomalle ja huomasin, että Anthropic oli juuri jatkanut Fable-kokeilua. Koska käyttökiintiöni nollaantuu viikoittain, firma maksaa kapasiteetista joka tapauksessa ja käyttämätön osuus menee hukkaan. Täydellinen tilaisuus testata mallia, jonka olin siihen asti sivuuttanut koko saatavuussirkuksen takia.
+
+Annoin Fablelle pääsyn sivuhuslausprojektini [tyovuorolista.fi](https://tyovuorolista.fi):n lähdekoodiin ja kerroin rakentaneeni sitä usean vuoden ajan: aluksi varsin vaatimattomalla osaamisella, myöhemmin paremmalla, mutta samalla kasvavilla vaatimuksilla. Pyysin sitä etsimään bugeja, tietoturvariskejä, arkkitehtonisia ongelmia, kuollutta koodia ja muuta vastaavaa.
+
+Malli työskenteli noin puoli tuntia ja tuotti sellaisen häpeäpuun, johon ei itseään mielellään kiinnittäisi:
+
+- useita tietoturvariskejä
+- selkeitä asiakkaisiin vaikuttavia bugeja, joista osa oli ollut tuotannossa vuosia
+- epäjohdonmukaisia ominaisuuksia
+- teknistä ja arkkitehtonista velkaa
+- toimimattomia ja puutteellisia testejä
+- huonoja tietokantaratkaisuja
+- paljon muuta
+
+Olin tiennyt, että järjestelmässä oli teknistä velkaa ja heikkoja ratkaisuja. En ollut ymmärtänyt, kuinka laajasti ja yksityiskohtaisesti malli pystyisi löytämään niitä.
+
+Aloin korjata ongelmia halvemmilla malleilla, koska Fable on helvetin kallis ja ahmii tokeneita. Kun olin käyttänyt Cursor-tilaukseni tokenit muutaman ensimmäisen kohdan korjaamiseen, huomasin, että firman Claude-kapasiteettia oli yhä jäljellä.
+
+Laitoin Fablen korjaamaan omia löydöksiään.
+
+Noin puoli tuntia myöhemmin suurimmat ongelmat oli korjattu. Malli oli rakentanut testausinfrastruktuuria uusiksi, kirjoittanut valtavan määrän testejä, poistanut kuollutta koodia ja turhia riippuvuuksia sekä tehnyt tietoturvakorjauksia.
+
+Samalla se huomasi Stripen maksudatasta, että olin vanhan virheen vuoksi tuplalaskuttanut yhtä asiakasta kuukausien ajan. Palautin rahat, joten tämä koodikatselmointi maksoi heti satoja euroja.
+
+Kaikkeen tähän kului vain noin puolet viikoittaisesta Fable-kiintiöstäni.
+
+## Huumekauppiaiden metodit
+
+Tämä on tietysti kieroa ja epätervettä. Minut koukutetaan yhteen markkinoiden kalleimmista kielimalleista raskaasti subventoidulla määräaikaiskäytöllä, minkä jälkeen edessä on listahinta.
+
+Silti en ole ollenkaan varma, pahastunko tästä niin paljon, että jättäisin maksamatta.
+
+Houkutus käyttää Fablea on käsittämättömän suuri.
+
+## Viekö se meidän työt?
+
+Kun kielimalli on näin hyvä, täytyy kysyä: viekö se meidän työt?
+
+Uskon edelleen, että historia toistaa itseään. Kun jokin asia halpenee rajusti, sen käyttö lisääntyy. Lisääntynyt käyttö synnyttää ympärilleen uutta toimintaa, uusia tuotteita ja uusia tarpeita.
+
+Ohjelmistoja rakennetaan enemmän, nopeammin ja yhä uusiin tarkoituksiin. Lopulta teemme entistä enemmän töitä paljon suuremmalla nopeudella, ja maapallo jatkaa kulkuaan pohjattomassa avaruudessa.
+
+Mutta viekö se jonkun työt?
+
+Sanotaan näin: jos voisin palkata sivuhuslausfirmaani teknisen ihmisen 3&nbsp;000 eurolla kuukaudessa, laittaisin rahat hetkeäkään miettimättä Fablen tokeneihin.
+
+Kolmella tonnilla sillä ajaisi kuuhun ja takaisin.

@@ -1,0 +1,102 @@
+---
+interface Props {
+  source?: string;
+}
+
+const { source = "unknown" } = Astro.props;
+---
+
+<aside class="subscribe-box not-prose rounded-xl border-2 border-border bg-surface p-6 my-8">
+  <h2 class="text-xl font-semibold text-text-primary mb-2">
+    Get new posts by email
+  </h2>
+  <p class="text-text-secondary mb-4">
+    Occasional new posts, in English or Finnish. No spam, unsubscribe anytime.
+  </p>
+  <form class="subscribe-form flex flex-col sm:flex-row gap-3" data-source={source}>
+    <input
+      type="email"
+      name="email"
+      required
+      placeholder="you@example.com"
+      aria-label="Email address"
+      class="flex-1 px-4 py-3 bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-primary placeholder-text-muted transition-all"
+    />
+    <select
+      name="language"
+      aria-label="Email language"
+      class="px-4 py-3 bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-primary transition-all"
+    >
+      <option value="en">English</option>
+      <option value="fi">Suomi</option>
+    </select>
+    <!-- Honeypot: humans never see or fill this -->
+    <input
+      type="text"
+      name="website"
+      class="hidden"
+      tabindex="-1"
+      autocomplete="off"
+      aria-hidden="true"
+    />
+    <button
+      type="submit"
+      class="px-8 py-3 font-semibold text-text-primary bg-background border-2 border-primary rounded-xl hover:bg-primary hover:border-primary-hover transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+    >
+      Subscribe
+    </button>
+  </form>
+  <p class="subscribe-status mt-3 text-sm hidden"></p>
+</aside>
+
+<script>
+  document
+    .querySelectorAll<HTMLFormElement>("form.subscribe-form")
+    .forEach((form) => {
+      const box = form.closest(".subscribe-box");
+      const status =
+        box?.querySelector<HTMLParagraphElement>(".subscribe-status");
+      const button = form.querySelector<HTMLButtonElement>(
+        'button[type="submit"]'
+      );
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!status || !button) return;
+
+        button.disabled = true;
+        button.textContent = "Subscribing...";
+        status.classList.add("hidden");
+
+        const formData = new FormData(form);
+        try {
+          const response = await fetch("/mail-api/subscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: formData.get("email"),
+              language: formData.get("language"),
+              website: formData.get("website"),
+              source: form.dataset.source,
+            }),
+          });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error(result.error || "Subscription failed");
+          }
+          status.textContent =
+            "Almost there — check your inbox to confirm your subscription.";
+          status.className =
+            "subscribe-status mt-3 text-sm text-status-success";
+          form.reset();
+        } catch (error) {
+          status.textContent =
+            error instanceof Error ? error.message : "Subscription failed";
+          status.className = "subscribe-status mt-3 text-sm text-status-error";
+        } finally {
+          button.disabled = false;
+          button.textContent = "Subscribe";
+        }
+      });
+    });
+</script>

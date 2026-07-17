@@ -18,6 +18,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# mailing-list service data (SQLite)
+mail-list/data/
+
 # macOS-specific files
 .DS_Store
 

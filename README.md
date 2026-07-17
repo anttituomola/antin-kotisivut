@@ -61,5 +61,10 @@ The projects are deployed on Vercel:
 
 My personal internet space
 
-TODO:
-- mailing list!
+## Mailing list
+
+Blog posts are emailed to subscribers 30 minutes after publishing.
+Subscribe boxes live at the end of each post, on the blog index and in the
+footer (`src/components/SubscribeBox.astro`). The backend service lives in
+`mail-list/` (Express + SQLite + AWS SES, runs on UpCloud via pm2) — see
+`mail-list/README.md`.

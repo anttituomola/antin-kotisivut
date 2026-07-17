@@ -34,7 +34,8 @@ Mailing-list service for anttituomola.fi. Runs on the UpCloud server
 | Variable | Default | Notes |
 | --- | --- | --- |
 | `PORT` | `3004` | |
-| `PUBLIC_BASE_URL` | — | Public URL of this service, used in email links |
+| `PUBLIC_BASE_URL` | — | Public URL of this service (fallback for email links) |
+| `EMAIL_LINK_BASE_URL` | — | Base for confirm/unsubscribe links in emails; set to the site's proxy, e.g. `https://www.anttituomola.fi/mail-api` |
 | `FEED_URL` | site feed | |
 | `FROM_EMAIL` / `FROM_NAME` | — | Must be a verified SES identity |
 | `SEND_DELAY_MINUTES` | `30` | Delay between detecting a post and emailing it |

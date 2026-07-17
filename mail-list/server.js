@@ -29,6 +29,11 @@ const PORT = Number(process.env.PORT || 3004);
 const PUBLIC_BASE_URL = (
   process.env.PUBLIC_BASE_URL || `http://localhost:${PORT}`
 ).replace(/\/+$/, "");
+// Base URL for links inside emails. Points at the site's /mail-api proxy by
+// default in production so recipients never see the backend hostname.
+const LINK_BASE = (
+  process.env.EMAIL_LINK_BASE_URL || `${PUBLIC_BASE_URL}/api`
+).replace(/\/+$/, "");
 const FEED_URL =
   process.env.FEED_URL || "https://www.anttituomola.fi/blog/feed.json";
 const FROM_EMAIL = process.env.FROM_EMAIL || "antti@anttituomola.fi";
@@ -206,7 +211,7 @@ async function sendEmail({ to, subject, text, html, unsubscribeUrl }) {
 }
 
 function confirmationEmail(sub) {
-  const url = `${PUBLIC_BASE_URL}/api/confirm?token=${sub.confirm_token}`;
+  const url = `${LINK_BASE}/confirm?token=${sub.confirm_token}`;
   const subject = "Confirm your subscription / Vahvista tilauksesi";
   const text = [
     "Confirm your subscription to Antti Tuomola's blog by opening this link:",
@@ -232,7 +237,7 @@ function confirmationEmail(sub) {
 
 function postEmail(sub, post) {
   const fi = post.language === "fi";
-  const unsubscribeUrl = `${PUBLIC_BASE_URL}/api/unsubscribe?token=${sub.unsub_token}`;
+  const unsubscribeUrl = `${LINK_BASE}/unsubscribe?token=${sub.unsub_token}`;
   const readLabel = fi ? "Lue kirjoitus" : "Read the post";
   const intro = fi ? "Uusi kirjoitus blogissa:" : "New post on the blog:";
   const unsubLabel = fi ? "Peru tilaus" : "Unsubscribe";
@@ -369,7 +374,7 @@ app.get("/api/unsubscribe", (req, res) => {
     page(
       "Unsubscribe",
       `<h1>Unsubscribe?</h1><p>Stop receiving new posts by email. / Lopeta uusien kirjoitusten tilaus.</p>
-       <form method="post" action="/api/unsubscribe?token=${token}">
+       <form method="post" action="">
          <button type="submit" style="padding: 0.75rem 1.5rem; background: #8AA399; color: #fff; border: none; border-radius: 0.5rem; cursor: pointer;">Unsubscribe / Peru tilaus</button>
        </form>`
     )

@@ -12,13 +12,17 @@ export const ALL: APIRoute = async ({ params, request }) => {
       ? undefined
       : await request.text();
 
-  const upstream = await fetch(`${MAIL_API_URL}/api/${path}`, {
-    method: request.method,
-    headers: {
-      "Content-Type": request.headers.get("content-type") ?? "application/json",
-    },
-    body,
-  });
+  const upstream = await fetch(
+    `${MAIL_API_URL}/api/${path}${new URL(request.url).search}`,
+    {
+      method: request.method,
+      headers: {
+        "Content-Type":
+          request.headers.get("content-type") ?? "application/json",
+      },
+      body,
+    }
+  );
 
   return new Response(await upstream.text(), {
     status: upstream.status,

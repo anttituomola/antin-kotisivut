@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import DefaultBlogImage from "../../components/DefaultBlogImage.astro";
+import SubscribeBox from "../../components/SubscribeBox.astro";
 
 const posts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? !data.draft : true;
@@ -34,6 +35,7 @@ const sortedPosts = Object.values(groupedPosts)
 <Layout title="Antti Tuomola - blog" activePage="blog">
   <div class="max-w-4xl mx-auto">
     <h1 class="text-4xl font-bold text-text-primary mb-8">Blog</h1>
+    <SubscribeBox source="blog-index" />
     <div class="grid gap-8">
       {
         sortedPosts.map((post) => (

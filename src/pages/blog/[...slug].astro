@@ -2,7 +2,6 @@
 import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import LanguageSwitcher from "../../components/LanguageSwitcher";
-import SubscribeBox from "../../components/SubscribeBox.astro";
 
 // Enable static pre-rendering
 export const prerender = true;
@@ -89,7 +88,6 @@ try {
     <div class="prose prose-lg mx-auto prose-a:target-[_blank]">
       <Content />
     </div>
-    <SubscribeBox source="post" />
     <div class="mt-8 flex gap-2 max-w-prose mx-auto flex-wrap">
       {
         post.data.tags.map((tag) => (

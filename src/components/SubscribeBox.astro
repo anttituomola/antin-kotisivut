@@ -25,7 +25,7 @@ const { source = "unknown" } = Astro.props;
     <select
       name="language"
       aria-label="Email language"
-      class="px-4 py-3 bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-primary transition-all"
+      class="subscribe-language pl-4 pr-10 py-3 bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-primary transition-all appearance-none bg-no-repeat"
     >
       <option value="en">English</option>
       <option value="fi">Suomi</option>
@@ -48,6 +48,14 @@ const { source = "unknown" } = Astro.props;
   </form>
   <p class="subscribe-status mt-3 text-sm hidden"></p>
 </aside>
+
+<style>
+  .subscribe-language {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8l4 4 4-4' stroke='%23D1CEC5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+    background-size: 1.25rem 1.25rem;
+  }
+</style>
 
 <script>
   document

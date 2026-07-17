@@ -36,6 +36,9 @@ const LINK_BASE = (
 ).replace(/\/+$/, "");
 const FEED_URL =
   process.env.FEED_URL || "https://www.anttituomola.fi/blog/feed.json";
+const SITE_URL = (
+  process.env.SITE_URL || new URL(FEED_URL).origin
+).replace(/\/+$/, "");
 const FROM_EMAIL = process.env.FROM_EMAIL || "antti@anttituomola.fi";
 const FROM_NAME = process.env.FROM_NAME || "Antti Tuomola";
 const SEND_DELAY_MINUTES = Number(process.env.SEND_DELAY_MINUTES || 30);
@@ -355,7 +358,7 @@ app.get("/api/confirm", (req, res) => {
   res.send(
     page(
       "Subscription confirmed",
-      "<h1>Subscription confirmed 🎉</h1><p>You'll receive new posts by email.</p><p>Tilaus vahvistettu — saat uudet kirjoitukset sähköpostiisi.</p>"
+      `<h1>Subscription confirmed 🎉</h1><p>You'll receive new posts by email.</p><p>Tilaus vahvistettu — saat uudet kirjoitukset sähköpostiisi.</p><p style="margin-top: 1.5rem;"><a href="${SITE_URL}/" style="color: #8AA399;">← Back to anttituomola.fi / Takaisin etusivulle</a></p>`
     )
   );
 });

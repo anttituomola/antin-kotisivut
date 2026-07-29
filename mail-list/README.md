@@ -38,6 +38,7 @@ Mailing-list service for anttituomola.fi. Runs on the UpCloud server
 | `EMAIL_LINK_BASE_URL` | — | Base for confirm/unsubscribe links in emails; set to the site's proxy, e.g. `https://www.anttituomola.fi/mail-api` |
 | `FEED_URL` | site feed | |
 | `FROM_EMAIL` / `FROM_NAME` | — | Must be a verified SES identity |
+| `ADMIN_EMAIL` | `FROM_EMAIL` | Receives a notification when someone confirms a subscription |
 | `SEND_DELAY_MINUTES` | `30` | Delay between detecting a post and emailing it |
 | `POLL_INTERVAL_MINUTES` | `5` | |
 | `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | — | Without these, emails are only logged |

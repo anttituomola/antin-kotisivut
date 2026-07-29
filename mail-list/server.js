@@ -41,6 +41,8 @@ const SITE_URL = (
 ).replace(/\/+$/, "");
 const FROM_EMAIL = process.env.FROM_EMAIL || "antti@anttituomola.fi";
 const FROM_NAME = process.env.FROM_NAME || "Antti Tuomola";
+// Where to notify when someone confirms a subscription. Defaults to FROM_EMAIL.
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || FROM_EMAIL).trim();
 const SEND_DELAY_MINUTES = Number(process.env.SEND_DELAY_MINUTES || 30);
 const POLL_INTERVAL_MINUTES = Number(process.env.POLL_INTERVAL_MINUTES || 5);
 const DRY_RUN = process.env.DRY_RUN === "true";
@@ -238,6 +240,32 @@ function confirmationEmail(sub) {
   return { subject, text, html };
 }
 
+function adminSignupNotification(sub) {
+  const lang = sub.language === "fi" ? "Finnish" : "English";
+  const source = sub.source || "(unknown)";
+  const subject = `New mailing list signup: ${sub.email}`;
+  const text = [
+    "Someone confirmed a blog mailing list subscription.",
+    "",
+    `Email: ${sub.email}`,
+    `Language: ${lang} (${sub.language})`,
+    `Source: ${source}`,
+    `Signed up: ${sub.created_at}`,
+  ].join("\n");
+  const html = `
+    <div style="font-family: sans-serif; max-width: 32rem; margin: 0 auto;">
+      <h2>New mailing list signup</h2>
+      <p>Someone confirmed a blog mailing list subscription.</p>
+      <ul>
+        <li><strong>Email:</strong> ${escapeHtml(sub.email)}</li>
+        <li><strong>Language:</strong> ${escapeHtml(lang)} (${escapeHtml(sub.language)})</li>
+        <li><strong>Source:</strong> ${escapeHtml(source)}</li>
+        <li><strong>Signed up:</strong> ${escapeHtml(sub.created_at)}</li>
+      </ul>
+    </div>`;
+  return { subject, text, html };
+}
+
 function postEmail(sub, post) {
   const fi = post.language === "fi";
   const unsubscribeUrl = `${LINK_BASE}/unsubscribe?token=${sub.unsub_token}`;
@@ -347,14 +375,25 @@ const page = (title, bodyHtml) => `<!doctype html>
 <body style="font-family: sans-serif; background: #3A3E2F; color: #E8E6E3; display: flex; justify-content: center; padding: 3rem 1rem;">
 <div style="max-width: 28rem;">${bodyHtml}</div></body></html>`;
 
-app.get("/api/confirm", (req, res) => {
+app.get("/api/confirm", async (req, res) => {
   const sub = q.subscriberByConfirmToken.get(String(req.query.token || ""));
   if (!sub) {
     return res
       .status(404)
       .send(page("Invalid link", "<h1>Invalid or expired link</h1><p>Linkki ei kelpaa tai on vanhentunut.</p>"));
   }
+  const wasPending = sub.status === "pending";
   q.confirmSubscriber.run(sub.id);
+
+  // Notify admin only on the first confirmation (not re-clicks of the link)
+  if (wasPending && ADMIN_EMAIL) {
+    try {
+      await sendEmail({ to: ADMIN_EMAIL, ...adminSignupNotification(sub) });
+    } catch (err) {
+      console.error("admin signup notification failed:", err);
+    }
+  }
+
   res.send(
     page(
       "Subscription confirmed",

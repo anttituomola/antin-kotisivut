@@ -7,7 +7,7 @@ Source for **[anttituomola.fi](https://www.anttituomola.fi/)** and a collection 
 This is a monorepo containing:
 
 - **Website** — an Astro and MDX portfolio, CV and blog
-- **docs/blog-ideapankki.md** — internal blog post idea bank (not published on the site)
+- **docs/blog-ideapankki.example.md** — blog post idea bank template; copy to `docs/blog-ideapankki.local.md` (gitignored) and keep real ideas local only
 - **Toolbox** — a Vite/React application for small personal utilities
 - **Mailing list service** — an Express, SQLite and AWS SES service for blog subscriptions
 

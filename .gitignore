@@ -18,6 +18,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# author-only blog idea bank (copy from docs/blog-ideapankki.example.md)
+docs/blog-ideapankki.local.md
+
 # mailing-list service data (SQLite)
 mail-list/data/
 

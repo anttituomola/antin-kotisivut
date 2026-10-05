@@ -26,3 +26,7 @@ mail-list/data/
 
 # jetbrains setting folder
 .idea/
+
+# author-only blog idea bank (copy from docs/blog-ideapankki.example.md)
+docs/blog-ideapankki.local.md
+

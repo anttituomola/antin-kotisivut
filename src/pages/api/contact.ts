@@ -4,7 +4,15 @@ import { sendEmails } from '../../lib/email';
 export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
-    const { name, email, message } = data;
+    const { name, email, message, website, lang, topic } = data;
+
+    // Honeypot: bots fill the hidden field; pretend success
+    if (website) {
+      return new Response(
+        JSON.stringify({ message: 'Emails sent successfully' }),
+        { status: 200 }
+      );
+    }
 
     // Basic validation
     if (!name || !email || !message) {
@@ -14,7 +22,13 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const result = await sendEmails({ name, email, message });
+    const result = await sendEmails({
+      name,
+      email,
+      message,
+      lang: lang === 'fi' ? 'fi' : 'en',
+      topic: typeof topic === 'string' ? topic.slice(0, 60) : undefined,
+    });
 
     if (!result.success) {
       return new Response(

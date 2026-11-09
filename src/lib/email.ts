@@ -31,9 +31,28 @@ interface EmailData {
   name: string;
   email: string;
   message: string;
+  lang?: "en" | "fi";
+  topic?: string;
 }
 
-export async function sendEmails({ name, email, message }: EmailData) {
+export async function sendEmails({
+  name,
+  email,
+  message,
+  lang = "en",
+  topic,
+}: EmailData) {
+  const confirmation =
+    lang === "fi"
+      ? {
+          subject: "Kiitos viestistäsi",
+          body: `Hei ${name},\n\nKiitos viestistäsi. Tässä kopio lähettämistäsi tiedoista:\n\n${message}\n\nPalaan asiaan pian.\n\nTerveisin\nAntti`,
+        }
+      : {
+          subject: "Thank you for your message",
+          body: `Hi ${name},\n\nThank you for your message. Here's a copy of what you sent:\n\n${message}\n\nI'll get back to you soon!\n\nBest regards,\nAntti`,
+        };
+
   // Send confirmation email to the sender
   const confirmationEmail = new SendEmailCommand({
     Source: import.meta.env.ADMIN_EMAIL,
@@ -42,11 +61,11 @@ export async function sendEmails({ name, email, message }: EmailData) {
     },
     Message: {
       Subject: {
-        Data: "Thank you for your message",
+        Data: confirmation.subject,
       },
       Body: {
         Text: {
-          Data: `Hi ${name},\n\nThank you for your message. Here's a copy of what you sent:\n\n${message}\n\nI'll get back to you soon!\n\nBest regards,\nAntti`,
+          Data: confirmation.body,
         },
       },
     },
@@ -61,7 +80,9 @@ export async function sendEmails({ name, email, message }: EmailData) {
     ReplyToAddresses: [email],
     Message: {
       Subject: {
-        Data: `New contact form submission from ${name}`,
+        Data: topic
+          ? `[${topic}] New contact form submission from ${name}`
+          : `New contact form submission from ${name}`,
       },
       Body: {
         Text: {

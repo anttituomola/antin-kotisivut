@@ -1,0 +1,153 @@
+---
+const roles = [
+  { value: "Taloyhtiö tai kiinteistö", label: "Taloyhtiö tai kiinteistö" },
+  { value: "Yritys", label: "Hämeenkadun yritys" },
+  { value: "Tampereen kaupunki", label: "Tampereen kaupunki" },
+  { value: "Muu", label: "Muu, esimerkiksi asukas tai yhdistys" },
+];
+
+const inputClass =
+  "w-full px-4 py-3 bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-text-primary placeholder-text-muted transition-all";
+---
+
+<aside
+  id="yhteydenotto"
+  class="hameenkatu-contact not-prose rounded-xl border-2 border-border bg-surface p-6 my-8"
+>
+  <h2 class="text-xl font-semibold text-text-primary mb-2">
+    Kiinnostaako? Jätä yhteystietosi
+  </h2>
+  <p class="text-text-secondary mb-6">
+    Kerään yhteen Hämeenkadun kiinteistöt, yritykset ja kaupungin edustajat,
+    joita yhteinen siivous kiinnostaa. Otan yhteyttä, kun koolla on tarpeeksi
+    porukkaa ensimmäiseen tapaamiseen.
+  </p>
+
+  <form class="hameenkatu-form space-y-5">
+    <fieldset class="space-y-2">
+      <legend class="text-text-secondary mb-2">Ketä edustat?</legend>
+      {
+        roles.map((role, i) => (
+          <label class="flex items-center gap-3 text-text-primary cursor-pointer">
+            <input
+              type="radio"
+              name="role"
+              value={role.value}
+              required={i === 0}
+              class="h-4 w-4 accent-primary"
+            />
+            {role.label}
+          </label>
+        ))
+      }
+    </fieldset>
+
+    <div class="space-y-2">
+      <label for="hk-organization" class="block text-text-secondary">
+        Taloyhtiön, yrityksen tai yksikön nimi <span class="text-text-muted">(valinnainen)</span>
+      </label>
+      <input type="text" id="hk-organization" name="organization" class={inputClass} />
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div class="space-y-2">
+        <label for="hk-name" class="block text-text-secondary">Nimi</label>
+        <input type="text" id="hk-name" name="name" required autocomplete="name" class={inputClass} />
+      </div>
+      <div class="space-y-2">
+        <label for="hk-email" class="block text-text-secondary">Sähköposti</label>
+        <input type="email" id="hk-email" name="email" required autocomplete="email" class={inputClass} />
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <label for="hk-message" class="block text-text-secondary">
+        Terveiset tai kysymykset <span class="text-text-muted">(valinnainen)</span>
+      </label>
+      <textarea id="hk-message" name="message" rows="3" class={`${inputClass} resize-none`}></textarea>
+    </div>
+
+    <!-- Honeypot: humans never see or fill this -->
+    <input
+      type="text"
+      name="website"
+      class="hidden"
+      tabindex="-1"
+      autocomplete="off"
+      aria-hidden="true"
+    />
+
+    <p class="text-sm text-text-muted">
+      Käytän tietoja vain tähän hankkeeseen liittyvään yhteydenpitoon, enkä
+      luovuta niitä eteenpäin.
+    </p>
+
+    <button
+      type="submit"
+      class="px-8 py-3 font-semibold text-text-primary bg-background border-2 border-primary rounded-xl hover:bg-primary hover:border-primary-hover transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+    >
+      Lähetä
+    </button>
+  </form>
+  <p class="hameenkatu-status mt-3 text-sm hidden" role="status"></p>
+</aside>
+
+<script>
+  document
+    .querySelectorAll<HTMLFormElement>("form.hameenkatu-form")
+    .forEach((form) => {
+      const box = form.closest(".hameenkatu-contact");
+      const status = box?.querySelector<HTMLParagraphElement>(".hameenkatu-status");
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!status || !button) return;
+
+        button.disabled = true;
+        button.textContent = "Lähetetään...";
+        status.classList.add("hidden");
+
+        const data = new FormData(form);
+        const role = String(data.get("role") ?? "");
+        const organization = String(data.get("organization") ?? "").trim();
+        const note = String(data.get("message") ?? "").trim();
+        const message = [
+          `Edustaa: ${role}`,
+          `Organisaatio: ${organization || "-"}`,
+          "",
+          note || "(ei viestiä)",
+        ].join("\n");
+
+        try {
+          const response = await fetch("/api/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: data.get("name"),
+              email: data.get("email"),
+              message,
+              website: data.get("website"),
+              lang: "fi",
+              topic: "Hämeenkadun siivous",
+            }),
+          });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error(result.error || "Lähetys epäonnistui");
+          }
+          status.textContent =
+            "Kiitos! Sain tietosi, ja lähetin sinulle vahvistuksen sähköpostiin.";
+          status.className = "hameenkatu-status mt-3 text-sm text-status-success";
+          form.reset();
+        } catch {
+          status.textContent =
+            "Lähetys epäonnistui. Yritä uudelleen tai lähetä viesti yhteydenottosivun kautta.";
+          status.className = "hameenkatu-status mt-3 text-sm text-status-error";
+        } finally {
+          button.disabled = false;
+          button.textContent = "Lähetä";
+        }
+      });
+    });
+</script>

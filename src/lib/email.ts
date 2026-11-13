@@ -42,15 +42,18 @@ export async function sendEmails({
   lang = "en",
   topic,
 }: EmailData) {
+  // The auto-reply goes to an address typed into a public form, so it must not
+  // contain any user-supplied text (name/message); otherwise the form could be
+  // abused to relay spam through our SES account.
   const confirmation =
     lang === "fi"
       ? {
           subject: "Kiitos viestistäsi",
-          body: `Hei ${name},\n\nKiitos viestistäsi. Tässä kopio lähettämistäsi tiedoista:\n\n${message}\n\nPalaan asiaan pian.\n\nTerveisin\nAntti`,
+          body: `Hei,\n\nKiitos viestistäsi. Sain sen, ja palaan asiaan pian.\n\nTerveisin\nAntti`,
         }
       : {
           subject: "Thank you for your message",
-          body: `Hi ${name},\n\nThank you for your message. Here's a copy of what you sent:\n\n${message}\n\nI'll get back to you soon!\n\nBest regards,\nAntti`,
+          body: `Hi,\n\nThank you for your message. I got it and will get back to you soon.\n\nBest regards,\nAntti`,
         };
 
   // Send confirmation email to the sender

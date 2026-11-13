@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Button from "../components/Button.astro";
+
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
 ---
 
 <Layout title="Antti Tuomola - Contact" activePage="contact">
@@ -56,6 +58,20 @@ import Button from "../components/Button.astro";
         </div>
       </div>
 
+      <!-- Honeypot: humans never see or fill this -->
+      <input
+        type="text"
+        name="website"
+        class="hidden"
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+      />
+
+      {turnstileSiteKey && (
+        <div class="cf-turnstile flex justify-end" data-sitekey={turnstileSiteKey} data-appearance="interaction-only"></div>
+      )}
+
       <div class="flex flex-col items-end gap-4">
         <Button type="submit"> Send Message </Button>
         <div id="form-status" class="text-text-secondary hidden"></div>
@@ -64,7 +80,12 @@ import Button from "../components/Button.astro";
   </div>
 </Layout>
 
+{turnstileSiteKey && (
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+)}
+
 <script>
+  const startedAt = Date.now();
   const form = document.getElementById("contact-form") as HTMLFormElement;
   const statusDiv = document.getElementById("form-status") as HTMLDivElement;
   const submitButton = form.querySelector(
@@ -85,6 +106,9 @@ import Button from "../components/Button.astro";
       name: formData.get("name"),
       email: formData.get("email"),
       message: formData.get("message"),
+      website: formData.get("website"),
+      startedAt,
+      turnstileToken: formData.get("cf-turnstile-response"),
     };
 
     try {
@@ -113,6 +137,7 @@ import Button from "../components/Button.astro";
     } finally {
       submitButton.disabled = false;
       submitButton.textContent = "Send Message";
+      (window as any).turnstile?.reset?.();
       statusDiv.classList.remove("hidden");
     }
   });

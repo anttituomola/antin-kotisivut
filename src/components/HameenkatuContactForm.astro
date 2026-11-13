@@ -93,6 +93,7 @@ const inputClass =
 </aside>
 
 <script>
+  const startedAt = Date.now();
   document
     .querySelectorAll<HTMLFormElement>("form.hameenkatu-form")
     .forEach((form) => {
@@ -128,6 +129,7 @@ const inputClass =
               email: data.get("email"),
               message,
               website: data.get("website"),
+              startedAt,
               lang: "fi",
               topic: "Hämeenkadun siivous",
             }),

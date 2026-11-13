@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly AWS_ACCESS_KEY_ID: string;
   readonly AWS_SECRET_ACCESS_KEY: string;
   readonly ADMIN_EMAIL: string;
+  readonly TURNSTILE_SECRET_KEY?: string;
+  readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
 }
 
 interface ImportMeta {

@@ -1,22 +1,11 @@
 import type { APIRoute } from 'astro';
 import { sendEmails } from '../../lib/email';
 
-const MIN_FILL_MS = 3000;
-
 const json = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
   });
-
-// Bot-generated random strings like "qcPmFkFdgSCNDGrZtKMZMfn": one long token
-// with many lower/upper case switches.
-function looksRandom(value: string): boolean {
-  const v = value.trim();
-  if (v.length < 10 || /\s/.test(v)) return false;
-  const switches = (v.match(/[a-z][A-Z]|[A-Z][a-z]/g) || []).length;
-  return switches >= 4 && switches / v.length > 0.25;
-}
 
 // Cloudflare Turnstile is enforced only once TURNSTILE_SECRET_KEY is set.
 async function verifyTurnstile(token: string, remoteip?: string): Promise<boolean> {
@@ -42,18 +31,7 @@ async function verifyTurnstile(token: string, remoteip?: string): Promise<boolea
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     const data = await request.json();
-    const { name, email, message, website, lang, topic, startedAt, turnstileToken } = data ?? {};
-
-    // Spam checks: pretend success so bots get no signal.
-    const honeypotFilled = typeof website === 'string' && website.trim() !== '';
-    const tooFast = typeof startedAt !== 'number' || Date.now() - startedAt < MIN_FILL_MS;
-    const gibberish =
-      (typeof name === 'string' && looksRandom(name)) ||
-      (typeof message === 'string' && looksRandom(message));
-    if (honeypotFilled || tooFast || gibberish) {
-      console.log('Contact form spam dropped', { honeypotFilled, tooFast, gibberish });
-      return json({ message: 'Emails sent successfully' }, 200);
-    }
+    const { name, email, message, lang, topic, turnstileToken } = data ?? {};
 
     // Basic validation
     if (

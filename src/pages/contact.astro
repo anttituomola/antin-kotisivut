@@ -58,16 +58,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
         </div>
       </div>
 
-      <!-- Honeypot: humans never see or fill this -->
-      <input
-        type="text"
-        name="website"
-        class="hidden"
-        tabindex="-1"
-        autocomplete="off"
-        aria-hidden="true"
-      />
-
       {turnstileSiteKey && (
         <div class="cf-turnstile flex justify-end" data-sitekey={turnstileSiteKey} data-appearance="interaction-only"></div>
       )}
@@ -85,7 +75,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
 )}
 
 <script>
-  const startedAt = Date.now();
   const form = document.getElementById("contact-form") as HTMLFormElement;
   const statusDiv = document.getElementById("form-status") as HTMLDivElement;
   const submitButton = form.querySelector(
@@ -106,8 +95,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
       name: formData.get("name"),
       email: formData.get("email"),
       message: formData.get("message"),
-      website: formData.get("website"),
-      startedAt,
       turnstileToken: formData.get("cf-turnstile-response"),
     };
 
